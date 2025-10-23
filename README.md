@@ -3,11 +3,11 @@
 **Research Analytics Platform**  
 *A simple platform for training ML models and running statistical analysis*  
 **Authors:** Luke Rimmo Lego & Dr. Denver Baptiste  
-**Status:** Student research project — actively maintained as of this README
+**Status:** Developed
 
 ---
 
-> **Note (very human):** This README was written from the perspective of a student-academic team building an approachable research tool. The goal is to make it easy for other students and early researchers to download, run, understand, and extend the project. If you carry this forward, please keep changes documented and keep the spirit of reproducibility.
+> **Note :** This README was written to make it easy for other students and early researchers to download, run, understand, and extend the project. If you carry this forward, please keep changes documented and keep the spirit of reproducibility and accessibility for research tools
 
 ---
 
