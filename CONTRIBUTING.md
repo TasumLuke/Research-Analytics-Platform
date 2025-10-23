@@ -1,6 +1,6 @@
-# CONTRIBUTING.md
+# CONTRIBUTING
 
-Thank you for your interest in contributing! This project is maintained from a student-academic perspective — please keep contributions clear and well-documented.
+Thank you for your interest in contributing! Please keep contributions clear and well-documented.
 
 ## How to contribute
 1. Fork the repository on GitHub.
