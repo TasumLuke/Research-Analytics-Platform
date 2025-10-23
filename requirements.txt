@@ -1,0 +1,26 @@
+# requirements.txt
+# Optional Python dependencies for backend/analysis utilities (use a virtualenv)
+# These packages support data loading, statistics, model training and a small API server.
+
+pandas>=1.5.0
+numpy>=1.24.0
+scipy>=1.10.0
+scikit-learn>=1.2.0
+statsmodels>=0.14.0
+fastapi>=0.95.0
+uvicorn>=0.22.0
+python-dotenv>=1.0.0
+pydantic>=1.10.7
+joblib>=1.2.0
+
+# Optional (for advanced model tracking / experimentation)
+mlflow>=2.5.0
+boto3>=1.26.0  # if you plan to push artifacts to S3/MinIO
+
+# Optional plotting in Python helpers
+matplotlib>=3.7.0
+seaborn>=0.12.2
+
+# Notes:
+# - Pin versions if you need stricter reproducibility (for example in CI).
+# - To install: python -m pip install -r requirements.txt
