@@ -1,4 +1,3 @@
-# requirements.txt
 # Optional Python dependencies for backend/analysis utilities (use a virtualenv)
 # These packages support data loading, statistics, model training and a small API server.
 
