@@ -9,11 +9,10 @@ on:
 
 jobs:
   build:
-    name: Node CI & optional Python smoke test
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [18.x]   # change or add 16.x, 20.x if you want a matrix
+        node-version: [18.x]
 
     steps:
       - name: Checkout repository
@@ -23,30 +22,27 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'npm'   # builtin npm cache support
+          # do not set cache: 'npm' here because it expects a lockfile
 
-      - name: Cache npm (fallback)
+      # Cache npm by hashing package.json (works without lockfile)
+      - name: Cache npm
         uses: actions/cache@v4
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-node-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-node-${{ matrix.node-version }}-${{ hashFiles('**/package.json') }}
           restore-keys: |
             ${{ runner.os }}-node-${{ matrix.node-version }}-
 
-      - name: Install JS dependencies
-        run: npm ci
+      - name: Install dependencies
+        run: npm install
 
-      - name: Lint (if configured)
+      - name: Lint
         run: npm run lint
-        # remove the next line if you want lint failures to block the build
-        continue-on-error: false
 
       - name: Run tests
-        run: |
-          # many test runners accept extra flags; adjust if needed
-          npm test --silent
+        run: npm test --silent
 
-      - name: Build (production)
+      - name: Build
         run: npm run build
 
       - name: Upload build artifact
@@ -55,35 +51,29 @@ jobs:
           name: site-dist
           path: |
             dist
-            build # include both common build folders just in case
+            build
 
-      # ---------- Optional Python support ----------
-      # We only run Python steps if a requirements.txt file exists.
+      # Optional Python steps (unchanged)
       - name: Check for requirements.txt
         id: reqcheck
         run: |
-          if [ -f requirements.txt ]; then
-            echo "exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
-          fi
+          if [ -f requirements.txt ]; then echo "exists=true" >> $GITHUB_OUTPUT; else echo "exists=false" >> $GITHUB_OUTPUT; fi
 
-      - name: Cache pip (optional)
+      - name: Cache pip
         if: steps.reqcheck.outputs.exists == 'true'
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
 
-      - name: Install Python requirements (optional)
+      - name: Install Python requirements
         if: steps.reqcheck.outputs.exists == 'true'
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
 
-      - name: Python smoke test (optional)
+      - name: Python smoke test
         if: steps.reqcheck.outputs.exists == 'true'
         run: |
-          # a tiny sanity check to show that the Python environment is fine
           python -c "import sys; print('python', sys.version)"
           python -c "import pandas as pd; print('pandas', pd.__version__)"
