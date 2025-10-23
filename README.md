@@ -1,6 +1,6 @@
 # Research Analytics Platform
 
-*A simple platform for training ML models and running statistical analysis*  
+*A platform for training ML models and running statistical analysis*  
 **Authors:** Luke Rimmo Lego & Dr. Denver Baptiste  
 **Status:** Developed
 
