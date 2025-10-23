@@ -1,4 +1,4 @@
-# Research Analytics Platform
+# Quackalyst the Research Analytics Platform
 
 *A platform for training ML models and running statistical analysis*  
 **Authors:** Luke Rimmo Lego & Dr. Denver Baptiste  
