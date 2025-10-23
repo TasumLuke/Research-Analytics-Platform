@@ -1,6 +1,5 @@
-# Research Analytics Platform — README.md
+# Research Analytics Platform
 
-**Research Analytics Platform**  
 *A simple platform for training ML models and running statistical analysis*  
 **Authors:** Luke Rimmo Lego & Dr. Denver Baptiste  
 **Status:** Developed
