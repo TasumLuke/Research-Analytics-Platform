@@ -19,12 +19,11 @@
 5. Running scripts and common npm commands  
 6. Python support (optional backend / analysis)  
 7. Environment variables & example `.env`  
-8. Docker 
-9. Testing / linting / CI suggestions  
-10. Data & model versioning suggestions for future work  
-11. Roadmap, things future contributors can add  
-12. Troubleshooting & tips  
-13. Contact
+8. Testing / linting / CI suggestions  
+9. Data & model versioning suggestions for future work  
+10. Roadmap, things future contributors can add  
+11. Troubleshooting & tips  
+12. Contact
 
 ---
 
@@ -162,18 +161,7 @@ cp .env.example .env
 
 ---
 
-## 8 — Docker
-We have provided a simple Dockerfile :
-
-```bash
-# build
-docker build -t research-analytics-platform:latest .
-
-# run
-docker run -p 8080:80 research-analytics-platform:latest
-```
-
-## 9 — Testing, linting & CI
+## 8 — Testing, linting & CI
 Some suggestions to keep the codebase healthy:
 - Use `vitest` or `jest` for unit tests.
 - Use `ESLint` + TypeScript rules and `Prettier` for formatting.
@@ -184,7 +172,7 @@ Example workflow file is included in this repo
 
 ---
 
-## 10 — Data & model versioning (advice for future work)
+## 9 — Data & model versioning (advice for future work)
 For a student project we provide simple client-side timestamped JSON versions. If you push this forward, consider:
 - Using DVC (Data Version Control) or MLflow for dataset + model tracking.
 - Persisting artifacts to object storage (S3, MinIO).
@@ -192,7 +180,7 @@ For a student project we provide simple client-side timestamped JSON versions. I
 
 ---
 
-## 11 — Roadmap — things future contributors can add
+## 10 — Roadmap — things future contributors can add
 These are concrete tasks that anyone can pick up and implement:
 - Add server-side training (FastAPI or Flask) to handle large datasets and async training.
 - Add cross-validation and more model types (XGBoost, LightGBM).
@@ -205,13 +193,13 @@ These are concrete tasks that anyone can pick up and implement:
 
 ---
 
-## 12 — Troubleshooting & tips 
+## 11 — Troubleshooting & tips 
 - If `npm run dev` shows port conflict, check which process holds the port and kill it, or change the port in `vite.config.js`.  
 - Large CSVs in-browser cause memory issues; add server-side ingestion for >50MB datasets.  
 - If metrics look wrong, confirm correct encoding of categorical labels and that missing values were handled.
 
 
-## 13 — Contact & how to carry it forward
+## 12 — Contact & how to carry it forward
 If you want to carry this project forward:
 1. Fork the repo and open a small PR with one focused change.  
 2. Try adding tests for your change and document usage in the README.  
