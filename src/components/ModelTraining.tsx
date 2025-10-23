@@ -74,11 +74,6 @@ const ModelTraining = ({ data, featureConfig, onModelTrained, metrics, currentVe
     setOptimizedParams(params);
 
     try {
-      // fake progress bar to show something's happening
-      const progressInterval = setInterval(() => {
-        setProgress((prev) => Math.min(prev + 10, 90));
-      }, 200);
-
       // convert text to numbers for categorical stuff
       const encodingMaps: { [key: string]: { [key: string]: number } } = {};
       const featureStats: { [key: string]: { mean: number; std: number } } = {};
