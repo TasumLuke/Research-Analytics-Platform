@@ -45,7 +45,7 @@ jobs:
         shell: bash
         run: |
           if [ ! -f eslint.config.js ]; then
-            echo "No eslint.config.js found — creating default ESLint v9 flat config..."
+            echo "No eslint.config.js found, creating default ESLint v9 flat config..."
             cat > eslint.config.js <<'EOF'
 import js from "@eslint/js";
 import globals from "globals";
@@ -77,11 +77,11 @@ EOF
 
       # Step 6: Lint
       - name: Run ESLint
-        run: npm run lint || echo "Lint warnings found — continuing."
+        run: npm run lint || echo "Lint warnings found so continuing."
 
       # Step 7: Run tests (if any)
       - name: Run tests
-        run: npm test --silent || echo "No tests found — skipping."
+        run: npm test --silent || echo "No tests found, hence skipping."
 
       # Step 8: Build
       - name: Build the app
