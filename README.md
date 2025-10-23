@@ -20,7 +20,6 @@
 8. Data & model versioning suggestions for future work  
 9. Roadmap, things future contributors can add  
 10. Troubleshooting & tips  
-11. Contact
 
 ---
 
@@ -173,12 +172,6 @@ These are concrete tasks that anyone can pick up and implement:
 - Large CSVs in-browser cause memory issues; add server-side ingestion for >50MB datasets.  
 - If metrics look wrong, confirm correct encoding of categorical labels and that missing values were handled.
 
-
-## 11 — Contact & how to carry it forward
-If you want to carry this project forward:
-1. Fork the repo and open a small PR with one focused change.  
-2. Try adding tests for your change and document usage in the README.  
-3. If you are a student, list this work on a portfolio and mention that it's a collaborative, extensible research tool.
 
 Thanks for reading, good luck  
 — Luke Rimmo Lego & Dr. Denver Baptiste 
