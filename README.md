@@ -14,18 +14,17 @@
 ## Table of contents
 1. Overview  
 2. What you can do with this repo  
-3. Quick start — download, install, run locally  
+3. Quick start, download, install, run locally  
 4. Git & collaboration workflow (fork / clone / PR)  
 5. Running scripts and common npm commands  
 6. Python support (optional backend / analysis)  
 7. Environment variables & example `.env`  
-8. Docker (optional)  
+8. Docker 
 9. Testing / linting / CI suggestions  
 10. Data & model versioning suggestions for future work  
-11. Roadmap — things future contributors can add  
+11. Roadmap, things future contributors can add  
 12. Troubleshooting & tips  
-13. License & credits  
-14. Contact
+13. Contact
 
 ---
 
@@ -34,7 +33,7 @@ This repository contains a lightweight frontend (React + TypeScript) for loading
 
 ---
 
-## 2 — What you can do with this repo
+## 2 — What you can do with this ?
 - Upload CSV datasets and preview them.  
 - Run descriptive statistics and hypothesis tests.  
 - Train Random Forest models (client-side) and view basic metrics and feature importances.  
@@ -43,13 +42,13 @@ This repository contains a lightweight frontend (React + TypeScript) for loading
 
 ---
 
-## 3 — Quick start — download, install, run locally
+## 3 — Quick start : download, install, run locally
 
 ### Prerequisites
 - Node.js (LTS recommended; Node 18+ is a safe baseline).  
 - npm (bundled with Node) or yarn.  
 - Git.  
-- (Optional) Python 3.9+ if you want to use the optional analysis/backend scripts in `python/`. See **Python support** below.
+-  Python 3.9+ if you want to use the optional analysis/backend scripts in `python/`. See **Python support** below.
 
 ### Clone & run locally (minimum steps)
 ```bash
@@ -58,7 +57,7 @@ git clone https://github.com/<your-username>/research-analytics-platform.git
 cd research-analytics-platform
 
 # 2) Install JS dependencies
-npm ci        # preferred for reproducible installs if package-lock.json present
+npm ci        # preferred for reproducible installs. We have provided our package-lock.json that was generated
 # or
 npm install
 
@@ -74,7 +73,7 @@ If the app uses Vite/Parcel/webpack, adjust `npm run dev` command if your projec
 
 ---
 
-## 4 — Git & collaboration workflow (student-friendly)
+## 4 — Git & collaboration workflow 
 If you want to contribute to the project or work in a team, follow this simple GitHub workflow:
 
 ```bash
@@ -123,8 +122,8 @@ npm test           # run tests (if present)
 
 ---
 
-## 6 — Python support (optional)
-We include a minimal Python/analysis utility folder (optional) for users who prefer running heavier preprocessing or server-side utilities. To run those:
+## 6 — Python support 
+We include a minimal Python/analysis utility folder for users who prefer running heavier preprocessing or server-side utilities. To run those:
 
 ```bash
 # create & activate a virtualenv
@@ -163,8 +162,8 @@ cp .env.example .env
 
 ---
 
-## 8 — Docker (optional)
-A simple Dockerfile is useful for reproducible deployments:
+## 8 — Docker
+We have provided a simple Dockerfile :
 
 ```bash
 # build
@@ -174,10 +173,6 @@ docker build -t research-analytics-platform:latest .
 docker run -p 8080:80 research-analytics-platform:latest
 ```
 
-You can also add a `docker-compose.yml` if you include a backend service.
-
----
-
 ## 9 — Testing, linting & CI
 Some suggestions to keep the codebase healthy:
 - Use `vitest` or `jest` for unit tests.
@@ -185,7 +180,7 @@ Some suggestions to keep the codebase healthy:
 - Add `husky` pre-commit hooks to run `npm run lint` and a subset of tests.
 - Add a GitHub Actions workflow to run `npm ci`, `npm run lint`, `npm test`, and `npm run build` on pull requests.
 
-Example workflow file is included in `.github/workflows/ci.yml` (recommended).
+Example workflow file is included in this repo
 
 ---
 
@@ -210,31 +205,17 @@ These are concrete tasks that anyone can pick up and implement:
 
 ---
 
-## 12 — Troubleshooting & tips (from fellow students)
+## 12 — Troubleshooting & tips 
 - If `npm run dev` shows port conflict, check which process holds the port and kill it, or change the port in `vite.config.js`.  
 - Large CSVs in-browser cause memory issues; add server-side ingestion for >50MB datasets.  
 - If metrics look wrong, confirm correct encoding of categorical labels and that missing values were handled.
 
----
 
-## 13 — License & credits
-- Recommended license: **MIT** (add a `LICENSE` file).  
-- Libraries used: React, TypeScript, Tailwind CSS, Recharts, ml-random-forest (or the specific RF lib included in `package.json`).  
-- Authors: Luke Rimmo Lego & Dr. Denver Baptiste. Please attribute if you reuse significant portions.
-
----
-
-## 14 — Contact & how to carry it forward
+## 13 — Contact & how to carry it forward
 If you want to carry this project forward:
 1. Fork the repo and open a small PR with one focused change.  
 2. Try adding tests for your change and document usage in the README.  
 3. If you are a student, list this work on a portfolio and mention that it's a collaborative, extensible research tool.
 
-If you want, I can also produce:
-- A ready-to-paste `README.md` file (this is it),  
-- A `Dockerfile` example,  
-- A `.github/workflows/ci.yml` skeleton, or  
-- A short `CONTRIBUTING.md`.
-
-Thanks for reading — good luck, and enjoy pushing this project forward!  
-— Luke Rimmo Lego & Dr. Denver Baptiste (student-research friendly)
+Thanks for reading, good luck  
+— Luke Rimmo Lego & Dr. Denver Baptiste 
