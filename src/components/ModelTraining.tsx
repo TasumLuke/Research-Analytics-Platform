@@ -18,8 +18,9 @@ interface ModelTrainingProps {
 }
 
 const ModelTraining = ({ data, featureConfig, onModelTrained, metrics, currentVersion }: ModelTrainingProps) => {
+  // training status
   const [isTraining, setIsTraining] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [trainingStep, setTrainingStep] = useState("");
   const [optimizedParams, setOptimizedParams] = useState<any>(null);
 
   // figure out best settings based on data size
@@ -62,18 +63,22 @@ const ModelTraining = ({ data, featureConfig, onModelTrained, metrics, currentVe
 
   // the main training function
   const trainModel = async () => {
+    // need enough data to train properly
     if (data.length < 10) {
       toast.error("Hey, need at least 10 rows to train this thing");
       return;
     }
 
     setIsTraining(true);
-    setProgress(0);
+    setTrainingStep("Starting training...");
 
     const params = optimizeHyperparameters();
     setOptimizedParams(params);
 
     try {
+      // step 1: prepare the data
+      setTrainingStep("Preparing data...");
+      
       // convert text to numbers for categorical stuff
       const encodingMaps: { [key: string]: { [key: string]: number } } = {};
       const featureStats: { [key: string]: { mean: number; std: number } } = {};
@@ -97,7 +102,8 @@ const ModelTraining = ({ data, featureConfig, onModelTrained, metrics, currentVe
         }
       });
 
-      // turn all features into numbers and normalize them
+      // step 2: turn all features into numbers and normalize them
+      setTrainingStep("Encoding features...");
       const features = data.map(row => 
         featureConfig.features.map(feature => {
           const value = row[feature];
@@ -112,7 +118,8 @@ const ModelTraining = ({ data, featureConfig, onModelTrained, metrics, currentVe
         })
       );
 
-      // prepare the target labels
+      // step 3: prepare the target labels
+      setTrainingStep("Processing target variable...");
       let labels: number[];
       let targetEncoding: { [key: string]: number } = {};
 
@@ -138,7 +145,8 @@ const ModelTraining = ({ data, featureConfig, onModelTrained, metrics, currentVe
         };
       }
 
-      // shuffle data randomly
+      // step 4: shuffle data randomly using fisher-yates algorithm
+      setTrainingStep("Shuffling data...");
       const indices = Array.from({ length: data.length }, (_, i) => i);
       for (let i = indices.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -155,12 +163,13 @@ const ModelTraining = ({ data, featureConfig, onModelTrained, metrics, currentVe
       const testX = testIndices.map(i => features[i]);
       const testY = testIndices.map(i => labels[i]);
 
-      // train the random forest
+      // step 5: train the random forest classifier
+      setTrainingStep(`Training ${params.nTrees} decision trees...`);
       const options = {
         nEstimators: params.nTrees,
         maxDepth: params.maxDepth,
         minNumSamples: params.minSamples,
-        seed: 42,
+        seed: 42, // consistent results
       };
 
       const classifier = new RFClassifier(options);
@@ -175,7 +184,8 @@ const ModelTraining = ({ data, featureConfig, onModelTrained, metrics, currentVe
         featureStats,
       };
 
-      // test the model
+      // step 6: test the model on unseen data
+      setTrainingStep("Evaluating model...");
       const predictions = classifier.predict(testX);
       const accuracy = predictions.filter((pred: number, idx: number) => pred === testY[idx]).length / testY.length;
 
@@ -237,7 +247,8 @@ const ModelTraining = ({ data, featureConfig, onModelTrained, metrics, currentVe
         auc,
       };
 
-      // figure out which features matter most
+      // step 7: figure out which features matter most using permutation importance
+      setTrainingStep("Calculating feature importance...");
       const baselineAccuracy = accuracy;
       const featureImportance = await Promise.all(
         featureConfig.features.map(async (name, idx) => {
@@ -261,16 +272,18 @@ const ModelTraining = ({ data, featureConfig, onModelTrained, metrics, currentVe
         importance: totalImportance > 0 ? (f.importance / totalImportance) * 100 : 0,
       }));
 
-      clearInterval(progressInterval);
-      setProgress(100);
-
-      toast.success(`Model's trained! Got ${accuracy.toFixed(1)}% accuracy`);
+      setTrainingStep("Done!");
+      
+      // show results
+      const accuracyPercent = (accuracy * 100).toFixed(1);
+      toast.success(`Model trained successfully! Accuracy: ${accuracyPercent}%`);
       onModelTrained(classifier, modelMetrics, normalizedImportance);
     } catch (error) {
       console.error("Training error:", error);
-      toast.error(error instanceof Error ? error.message : "Oops, training failed");
+      toast.error(error instanceof Error ? error.message : "Training failed");
     } finally {
       setIsTraining(false);
+      setTrainingStep("");
     }
   };
 
@@ -305,10 +318,10 @@ const ModelTraining = ({ data, featureConfig, onModelTrained, metrics, currentVe
             </div>
           )}
 
-          {isTraining && (
-            <div className="space-y-1">
-              <Progress value={progress} className="h-1" />
-              <p className="text-xs text-muted-foreground text-right">{progress}%</p>
+          {isTraining && trainingStep && (
+            <div className="flex items-center gap-2 p-2 bg-muted rounded text-xs">
+              <Loader2 className="w-3 h-3 animate-spin" />
+              <span>{trainingStep}</span>
             </div>
           )}
 
