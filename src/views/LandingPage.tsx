@@ -26,49 +26,45 @@ const LandingPage = () => {
           </p>
         </div>
 
-        {/* workflow options */}
-        <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-          {/* model training option */}
+        {/* the two main options - kept it simple */}
+        <div className="grid md:grid-cols-2 gap-5 max-w-3xl mx-auto">
+          {/* model training card */}
           <Card 
-            className="p-6 cursor-pointer border-2"
+            className="p-5 cursor-pointer hover:border-primary"
             onClick={() => goTo("/train-model")}
           >
-            <div className="flex flex-col space-y-4">
-              <div className="w-12 h-12 bg-primary/10 rounded flex items-center justify-center">
-                <Brain className="w-6 h-6 text-primary" />
-              </div>
+            <div className="space-y-3">
+              <Brain className="w-7 h-7 text-primary mb-2" />
               
               <div>
-                <h2 className="text-lg font-medium mb-2">AI Model Training</h2>
+                <h2 className="text-lg font-medium mb-1">AI Model Training</h2>
                 <p className="text-sm text-muted-foreground">
                   Train Random Forest models with version control
                 </p>
               </div>
 
-              <Button variant="outline" className="w-full">
+              <Button variant="outline" className="w-full mt-3">
                 Start Training
               </Button>
             </div>
           </Card>
 
-          {/* data analysis option */}
+          {/* data analysis card */}
           <Card 
-            className="p-6 cursor-pointer border-2"
+            className="p-5 cursor-pointer hover:border-primary"
             onClick={() => goTo("/analyze-data")}
           >
-            <div className="flex flex-col space-y-4">
-              <div className="w-12 h-12 bg-primary/10 rounded flex items-center justify-center">
-                <BarChart3 className="w-6 h-6 text-primary" />
-              </div>
+            <div className="space-y-3">
+              <BarChart3 className="w-7 h-7 text-primary mb-2" />
               
               <div>
-                <h2 className="text-lg font-medium mb-2">Data Analysis</h2>
+                <h2 className="text-lg font-medium mb-1">Data Analysis</h2>
                 <p className="text-sm text-muted-foreground">
                   Statistical analysis with ANOVA and visualizations
                 </p>
               </div>
 
-              <Button variant="outline" className="w-full">
+              <Button variant="outline" className="w-full mt-3">
                 Analyze Data
               </Button>
             </div>
