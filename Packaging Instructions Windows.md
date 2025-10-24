@@ -1,6 +1,6 @@
-# BUILDING THE WINDOWS EXECUTABLE — from the author
+# BUILDING THE WINDOWS EXECUTABLE, from the authors
 
-**Author:** Luke Rimmo Lego
+**Author:** Luke Rimmo Lego, Denver Baptiste
 
 This README describes, step-by-step, how to replicate my workflow to build the Windows executable (installer + portable EXE) for the *Research Analytics Platform — AI Model Trainer* from source. It includes exact commands run on my Windows 10 machine, common fixes I encountered, and quick troubleshooting notes so you can reproduce the build reliably.
 
@@ -39,7 +39,7 @@ npm run electron:build -- --win portable
 
 # 1. Environment & prerequisites
 
-- Windows 10/11 with **enough free disk space** — I recommend **≥ 5 GB** free on the drive where the project and build cache live (usually `C:`). NSIS and packaging produce large temporary files.
+- Windows 10/11 with **enough free disk space**, We recommend **≥ 5 GB** free on the drive where the project and build cache live (usually `C:`). NSIS and packaging produce large temporary files.
 - Node.js (LTS) and npm.
 - Git.
 - Optional but recommended: Visual Studio Build Tools (for native dependency builds) and Windows SDK (for `signtool.exe` if you want to sign installers locally).
@@ -63,7 +63,7 @@ If you see warnings about `electron` / `electron-builder` being in `dependencies
 
 ---
 
-# 3. package.json — minimal required fields & scripts
+# 3. package.json, minimal required fields & scripts
 
 Make sure your `package.json` includes the following **scripts** (adapt `dev` / `build` to your project if you use a different bundler):
 
@@ -103,9 +103,9 @@ Top-level `main` and a `build` config (this can sit in `package.json` or in `ele
 
 ---
 
-# 4. Fix Common problems I hit (and the exact fixes)
+# 4. Fix Common problems we hit (and the exact fixes)
 
-## Problem A — `electron` and `electron-builder` listed under `dependencies`
+## Problem A, `electron` and `electron-builder` listed under `dependencies`
 **Error:** `Package "electron" is only allowed in "devDependencies". Please remove it from the "dependencies" section.`
 
 **Fix (quick):** run:
@@ -132,42 +132,7 @@ Rename-Item -Path .\electron\main.js -NewName main.cjs
 npm pkg set main="electron/main.cjs"
 ```
 
-And use this minimal CommonJS `electron/main.cjs` (paste into the file):
-
-```js
-// electron/main.cjs
-const { app, BrowserWindow } = require('electron');
-const path = require('path');
-
-function createWindow () {
-  const win = new BrowserWindow({
-    width: 1200,
-    height: 800,
-    webPreferences: {
-      nodeIntegration: false,
-      contextIsolation: true,
-      preload: path.join(__dirname, 'preload.cjs')
-    }
-  });
-
-  if (process.env.NODE_ENV === 'development') {
-    win.loadURL('http://localhost:8080');
-  } else {
-    win.loadFile(path.join(__dirname, '..', 'dist', 'index.html'));
-  }
-}
-
-app.whenReady().then(createWindow);
-
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
-});
-
-app.on('activate', () => {
-  if (BrowserWindow.getAllWindows().length === 0) createWindow();
-});
-```
-
+And use this minimal CommonJS `electron/main.cjs`
 If your `preload` script uses `require`, rename it to `preload.cjs` and make sure the path above matches.
 
 ---
@@ -330,16 +295,3 @@ Get-CimInstance Win32_LogicalDisk -Filter "DeviceID='C:'" | Select-Object Device
 ```
 
 ---
-
-# 11. Final notes (from the author)
-
-I built this locally on Windows 10 and repeatedly ran into two issues that are worth remembering:
-1. **Disk space** — NSIS fails catastrophically when disk space is tiny. Free up a few GB and re-run. Portable builds are a fast escape hatch.
-2. **ESM vs CommonJS in main** — keep the renderer ESM if desired, but prefer CommonJS for the Electron main process (`.cjs`) to avoid `require` errors unless you intentionally use ESM everywhere.
-
-If you'd like, I can also:
-- produce a ready-to-paste `package.json` with `build`/`nsis`/`icon` settings,
-- generate a `preload.cjs` template for secure IPC between renderer and main,
-- or create the full GitHub Actions workflow that builds and signs the Windows artifact.
-
-Tell me which of those you'd like next and I’ll add it to the repo.
