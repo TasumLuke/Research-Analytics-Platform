@@ -1,73 +1,72 @@
-/* simple styles for the app */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    /* light mode - soft colors that are easy on eyes */
-    --background: 210 20% 96%;
-    --foreground: 215 15% 20%;
+    /* light mode - simple colors i picked */
+    --background: 0 0% 98%;
+    --foreground: 220 10% 25%;
     --card: 0 0% 100%;
-    --card-foreground: 215 15% 20%;
+    --card-foreground: 220 10% 25%;
     --popover: 0 0% 100%;
-    --popover-foreground: 215 15% 20%;
+    --popover-foreground: 220 10% 25%;
     
-    /* main color - soft blue */
-    --primary: 215 70% 50%;
-    --primary-foreground: 0 0% 98%;
+    /* main color - teal/cyan i liked */
+    --primary: 185 65% 45%;
+    --primary-foreground: 0 0% 100%;
     
-    /* other colors */
-    --secondary: 215 15% 40%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 210 20% 94%;
-    --muted-foreground: 215 10% 45%;
-    --accent: 215 70% 50%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 70% 55%;
-    --destructive-foreground: 0 0% 98%;
+    /* other stuff */
+    --secondary: 220 10% 60%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 220 10% 95%;
+    --muted-foreground: 220 8% 50%;
+    --accent: 185 65% 45%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 75% 60%;
+    --destructive-foreground: 0 0% 100%;
     
-    /* borders */
-    --border: 215 15% 85%;
-    --input: 215 15% 85%;
-    --ring: 215 70% 50%;
+    /* borders and stuff */
+    --border: 220 10% 88%;
+    --input: 220 10% 88%;
+    --ring: 185 65% 45%;
     
-    /* chart colors - simple palette */
-    --chart-1: 215 70% 50%;
-    --chart-2: 180 60% 45%;
-    --chart-3: 280 60% 55%;
-    --chart-4: 30 70% 50%;
-    --chart-5: 140 60% 45%;
+    /* chart colors - just picked some nice ones */
+    --chart-1: 185 65% 45%;
+    --chart-2: 160 55% 50%;
+    --chart-3: 270 55% 60%;
+    --chart-4: 25 75% 55%;
+    --chart-5: 140 55% 50%;
     
     --radius: 0.5rem;
   }
 
   .dark {
-    /* dark mode - easy on eyes at night */
-    --background: 215 25% 12%;
-    --foreground: 210 15% 88%;
-    --card: 215 20% 15%;
-    --card-foreground: 210 15% 88%;
-    --popover: 215 20% 15%;
-    --popover-foreground: 210 15% 88%;
-    --primary: 215 70% 55%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 215 15% 25%;
-    --secondary-foreground: 210 15% 88%;
-    --muted: 215 20% 18%;
-    --muted-foreground: 215 10% 60%;
-    --accent: 215 70% 55%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 65% 50%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 215 15% 22%;
-    --input: 215 15% 22%;
-    --ring: 215 70% 55%;
-    --chart-1: 215 70% 55%;
-    --chart-2: 180 60% 50%;
-    --chart-3: 280 60% 60%;
-    --chart-4: 30 70% 55%;
-    --chart-5: 140 60% 50%;
+    /* dark mode - easier on eyes when working late */
+    --background: 220 15% 10%;
+    --foreground: 220 10% 85%;
+    --card: 220 13% 13%;
+    --card-foreground: 220 10% 85%;
+    --popover: 220 13% 13%;
+    --popover-foreground: 220 10% 85%;
+    --primary: 185 60% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 10% 25%;
+    --secondary-foreground: 220 10% 85%;
+    --muted: 220 12% 16%;
+    --muted-foreground: 220 8% 60%;
+    --accent: 185 60% 50%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 70% 55%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 12% 20%;
+    --input: 220 12% 20%;
+    --ring: 185 60% 50%;
+    --chart-1: 185 60% 50%;
+    --chart-2: 160 50% 55%;
+    --chart-3: 270 50% 65%;
+    --chart-4: 25 70% 60%;
+    --chart-5: 140 50% 55%;
   }
 
   * { @apply border-border; }
