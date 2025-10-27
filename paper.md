@@ -24,7 +24,9 @@ affiliations:
   - name: Department of Chemistry and Chemical Biology, Charles V. Schaefer, Jr. School of Engineering and Science, Stevens Institute of Technology, Hoboken, NJ 07030, USA
     index: 2
 date: October 22, 2025
-bibliography: bibliography.bib
+bibliography: bibliography.bib    
+csl: apa.csl                     
+nocite: '@*'                    
 ---
 
 # Summary
