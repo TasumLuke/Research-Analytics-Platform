@@ -1,4 +1,4 @@
-// shared types for data analysis and model training
+// types we use everywhere
 
 export interface ResearchData {
   [key: string]: number | string;
@@ -10,6 +10,7 @@ export interface FeatureConfig {
   featureTypes: { [key: string]: 'numeric' | 'categorical' };
 }
 
+// for keeping track of different model versions
 export interface ModelVersion {
   id: string;
   version: string;
