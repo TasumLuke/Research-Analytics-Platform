@@ -1,5 +1,5 @@
-// dashboard for training machine learning models
-// ui components from https://www.shadcn.io/template (open source)
+// model training page - where the magic happens
+// using shadcn ui - https://www.shadcn.io/template
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/user-interface/tabs";
 import { Badge } from "@/components/user-interface/badge";
@@ -19,90 +19,90 @@ import { toast } from "sonner";
 import { ResearchData, FeatureConfig, ModelVersion } from "@/views/types";
 
 const AITraining = () => {
-  const navigate = useNavigate();
+  const nav = useNavigate();
   
-  // main state variables to keep track of everything
-  const [trainingData, setTrainingData] = useState<ResearchData[]>([]);
-  const [featureConfig, setFeatureConfig] = useState<FeatureConfig | null>(null);
-  const [model, setModel] = useState<any>(null);
-  const [predictions, setPredictions] = useState<any[]>([]);
-  const [modelMetrics, setModelMetrics] = useState<any>(null);
-  const [featureImportance, setFeatureImportance] = useState<any[]>([]);
-  const [modelVersions, setModelVersions] = useState<ModelVersion[]>([]);
-  const [currentVersion, setCurrentVersion] = useState<string>("v1.0");
+  // keeping track of all our stuff
+  const [data, setData] = useState<ResearchData[]>([]);
+  const [config, setConfig] = useState<FeatureConfig | null>(null);
+  const [trainedModel, setTrainedModel] = useState<any>(null);
+  const [preds, setPreds] = useState<any[]>([]);
+  const [metrics, setMetrics] = useState<any>(null);
+  const [importance, setImportance] = useState<any[]>([]);
+  const [versions, setVersions] = useState<ModelVersion[]>([]);
+  const [currVersion, setCurrVersion] = useState<string>("v1.0");
 
-  // when user uploads data
-  const handleDataUpload = (data: ResearchData[], config: FeatureConfig) => {
-    setTrainingData(data);
-    setFeatureConfig(config);
-    toast.success(`Got ${data.length} rows with ${config.features.length} features loaded up`);
+  // when they upload data
+  const onDataUpload = (uploadedData: ResearchData[], uploadedConfig: FeatureConfig) => {
+    setData(uploadedData);
+    setConfig(uploadedConfig);
+    toast.success(`Got ${uploadedData.length} rows with ${uploadedConfig.features.length} features`);
   };
 
-  // when model finishes training
-  const handleModelTrained = (trainedModel: any, metrics: any, importance: any[]) => {
-    setModel(trainedModel);
-    setModelMetrics(metrics);
-    setFeatureImportance(importance);
+  // after training finishes
+  const onModelTrained = (model: any, modelMetrics: any, featureImportance: any[]) => {
+    setTrainedModel(model);
+    setMetrics(modelMetrics);
+    setImportance(featureImportance);
 
-    // save this version
-    const newVersion: ModelVersion = {
+    // save it
+    const newVer: ModelVersion = {
       id: Date.now().toString(),
-      version: currentVersion,
+      version: currVersion,
       timestamp: new Date(),
-      model: trainedModel,
-      metrics,
-      featureImportance: importance,
-      datasetSize: trainingData.length,
-      featureConfig: featureConfig!,
+      model: model,
+      metrics: modelMetrics,
+      featureImportance: featureImportance,
+      datasetSize: data.length,
+      featureConfig: config!,
     };
 
-    setModelVersions(prev => [newVersion, ...prev]);
+    setVersions(prev => [newVer, ...prev]);
     
-    // bump up version number
-    const versionNum = parseFloat(currentVersion.substring(1)) + 0.1;
-    setCurrentVersion(`v${versionNum.toFixed(1)}`);
+    // increment version
+    const verNum = parseFloat(currVersion.substring(1)) + 0.1;
+    setCurrVersion(`v${verNum.toFixed(1)}`);
 
-    toast.success(`Model ${newVersion.version} is ready to go!`);
+    toast.success(`Model ${newVer.version} trained!`);
   };
 
-  // when user makes a prediction
-  const handlePrediction = (prediction: any) => {
-    // keep last 10 predictions
-    setPredictions((prev) => [prediction, ...prev].slice(0, 10));
+  // when making predictions
+  const onPrediction = (pred: any) => {
+    // just keep the last 10
+    setPreds((prev) => [pred, ...prev].slice(0, 10));
   };
 
-  // load an old version of the model
-  const loadModelVersion = (version: ModelVersion) => {
-    setModel(version.model);
-    setModelMetrics(version.metrics);
-    setFeatureImportance(version.featureImportance);
-    setFeatureConfig(version.featureConfig);
-    setTrainingData([]);
-    toast.success(`Loaded up model ${version.version} - throw in new data to train more`);
+  // load old model version
+  const loadVersion = (ver: ModelVersion) => {
+    setTrainedModel(ver.model);
+    setMetrics(ver.metrics);
+    setImportance(ver.featureImportance);
+    setConfig(ver.featureConfig);
+    setData([]);
+    toast.success(`Loaded ${ver.version} - upload new data to keep training`);
   };
 
-  // load a saved model file
-  const handleModelLoaded = (loadedModel: any, loadedMetrics: any, loadedImportance: any[], loadedConfig: any) => {
-    setModel(loadedModel);
-    setModelMetrics(loadedMetrics);
-    setFeatureImportance(loadedImportance);
-    setFeatureConfig(loadedConfig);
-    setTrainingData([]);
+  // load from file
+  const onModelLoaded = (model: any, modelMetrics: any, featureImportance: any[], modelConfig: any) => {
+    setTrainedModel(model);
+    setMetrics(modelMetrics);
+    setImportance(featureImportance);
+    setConfig(modelConfig);
+    setData([]);
   };
 
   return (
     <div className="min-h-screen bg-background">
       <main className="container mx-auto px-6 py-8 max-w-4xl">
         <div className="mb-6">
-          <Button variant="ghost" size="sm" onClick={() => navigate("/")} className="mb-4">
+          <Button variant="ghost" size="sm" onClick={() => nav("/")} className="mb-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
           </Button>
           <div className="flex items-center gap-3">
             <h2 className="text-2xl font-semibold">Model Training</h2>
-            {modelVersions.length > 0 && (
+            {versions.length > 0 && (
               <Badge variant="outline" className="text-xs">
-                {modelVersions.length} version{modelVersions.length !== 1 ? 's' : ''}
+                {versions.length} version{versions.length !== 1 ? 's' : ''}
               </Badge>
             )}
           </div>
@@ -113,16 +113,16 @@ const AITraining = () => {
             <TabsTrigger value="upload" className="text-xs">
               Upload
             </TabsTrigger>
-            <TabsTrigger value="train" disabled={trainingData.length === 0} className="text-xs">
+            <TabsTrigger value="train" disabled={data.length === 0} className="text-xs">
               Train
             </TabsTrigger>
-            <TabsTrigger value="predict" disabled={!model} className="text-xs">
+            <TabsTrigger value="predict" disabled={!trainedModel} className="text-xs">
               Predict
             </TabsTrigger>
-            <TabsTrigger value="results" disabled={predictions.length === 0} className="text-xs">
+            <TabsTrigger value="results" disabled={preds.length === 0} className="text-xs">
               Results
             </TabsTrigger>
-            <TabsTrigger value="versions" disabled={modelVersions.length === 0} className="text-xs">
+            <TabsTrigger value="versions" disabled={versions.length === 0} className="text-xs">
               Versions
             </TabsTrigger>
           </TabsList>
@@ -130,38 +130,38 @@ const AITraining = () => {
           <TabsContent value="upload" className="space-y-4">
             <div className="mb-3">
               <ModelSaveLoad
-                model={model}
-                metrics={modelMetrics}
-                featureImportance={featureImportance}
-                featureConfig={featureConfig}
-                onModelLoaded={handleModelLoaded}
+                model={trainedModel}
+                metrics={metrics}
+                featureImportance={importance}
+                featureConfig={config}
+                onModelLoaded={onModelLoaded}
               />
             </div>
-            <FileUpload onDataLoaded={handleDataUpload} />
-            {trainingData.length > 0 && featureConfig && (
-              <DataPreview data={trainingData} featureConfig={featureConfig} />
+            <FileUpload onDataLoaded={onDataUpload} />
+            {data.length > 0 && config && (
+              <DataPreview data={data} featureConfig={config} />
             )}
           </TabsContent>
 
           <TabsContent value="train" className="space-y-4">
             <ModelTraining
-              data={trainingData}
-              featureConfig={featureConfig!}
-              onModelTrained={handleModelTrained}
-              metrics={modelMetrics}
-              currentVersion={currentVersion}
+              data={data}
+              featureConfig={config!}
+              onModelTrained={onModelTrained}
+              metrics={metrics}
+              currentVersion={currVersion}
             />
-            {featureImportance.length > 0 && (
-              <FeatureImportance data={featureImportance} />
+            {importance.length > 0 && (
+              <FeatureImportance data={importance} />
             )}
-            {model && (
+            {trainedModel && (
               <div className="pt-2">
                 <ModelSaveLoad
-                  model={model}
-                  metrics={modelMetrics}
-                  featureImportance={featureImportance}
-                  featureConfig={featureConfig}
-                  onModelLoaded={handleModelLoaded}
+                  model={trainedModel}
+                  metrics={metrics}
+                  featureImportance={importance}
+                  featureConfig={config}
+                  onModelLoaded={onModelLoaded}
                 />
               </div>
             )}
@@ -169,24 +169,24 @@ const AITraining = () => {
 
           <TabsContent value="predict">
             <PredictionForm 
-              model={model} 
-              featureConfig={featureConfig!}
-              onPrediction={handlePrediction} 
+              model={trainedModel} 
+              featureConfig={config!}
+              onPrediction={onPrediction} 
             />
           </TabsContent>
 
           <TabsContent value="results">
             <ResultsVisualization
-              predictions={predictions}
-              metrics={modelMetrics}
+              predictions={preds}
+              metrics={metrics}
             />
           </TabsContent>
 
           <TabsContent value="versions">
             <ModelVersions
-              versions={modelVersions}
-              onLoadVersion={loadModelVersion}
-              currentVersion={currentVersion}
+              versions={versions}
+              onLoadVersion={loadVersion}
+              currentVersion={currVersion}
             />
           </TabsContent>
         </Tabs>
