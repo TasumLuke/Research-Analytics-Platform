@@ -1,5 +1,5 @@
-// dashboard for running statistical analysis
-// ui components from https://www.shadcn.io/template (open source)
+// stats analysis page
+// shadcn components - https://www.shadcn.io/template
 import { useState } from "react";
 import { Button } from "@/components/user-interface/button";
 import { ArrowLeft } from "lucide-react";
@@ -14,26 +14,26 @@ import { toast } from "sonner";
 import { AnalysisData } from "@/views/types";
 
 const DataAnalysis = () => {
-  const navigate = useNavigate();
+  const nav = useNavigate();
   
-  // keep track of uploaded data
+  // storing uploaded data and stuff
   const [data, setData] = useState<AnalysisData[]>([]);
-  const [columns, setColumns] = useState<string[]>([]);
-  const [columnTypes, setColumnTypes] = useState<{ [key: string]: 'numeric' | 'categorical' }>({});
+  const [cols, setCols] = useState<string[]>([]);
+  const [colTypes, setColTypes] = useState<{ [key: string]: 'numeric' | 'categorical' }>({});
 
-  // callback when data gets loaded
-  const handleDataLoaded = (loadedData: AnalysisData[], cols: string[], types: { [key: string]: 'numeric' | 'categorical' }) => {
+  // when data gets uploaded
+  const onDataLoaded = (loadedData: AnalysisData[], columns: string[], types: { [key: string]: 'numeric' | 'categorical' }) => {
     setData(loadedData);
-    setColumns(cols);
-    setColumnTypes(types);
-    toast.success(`Got ${loadedData.length} rows with ${cols.length} columns`);
+    setCols(columns);
+    setColTypes(types);
+    toast.success(`Got ${loadedData.length} rows with ${columns.length} columns`);
   };
 
   return (
     <div className="min-h-screen bg-background">
       <main className="container mx-auto px-6 py-8 max-w-4xl">
         <div className="mb-6">
-          <Button variant="ghost" size="sm" onClick={() => navigate("/")} className="mb-4">
+          <Button variant="ghost" size="sm" onClick={() => nav("/")} className="mb-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
           </Button>
@@ -57,30 +57,30 @@ const DataAnalysis = () => {
           </TabsList>
 
           <TabsContent value="upload">
-            <DataUploadAnalysis onDataLoaded={handleDataLoaded} />
+            <DataUploadAnalysis onDataLoaded={onDataLoaded} />
           </TabsContent>
 
           <TabsContent value="descriptive">
             <DescriptiveStats 
               data={data} 
-              columns={columns} 
-              columnTypes={columnTypes}
+              columns={cols} 
+              columnTypes={colTypes}
             />
           </TabsContent>
 
           <TabsContent value="tests">
             <StatisticalTests 
               data={data} 
-              columns={columns} 
-              columnTypes={columnTypes}
+              columns={cols} 
+              columnTypes={colTypes}
             />
           </TabsContent>
 
           <TabsContent value="visualize">
             <DataVisualization 
               data={data} 
-              columns={columns} 
-              columnTypes={columnTypes}
+              columns={cols} 
+              columnTypes={colTypes}
             />
           </TabsContent>
         </Tabs>
