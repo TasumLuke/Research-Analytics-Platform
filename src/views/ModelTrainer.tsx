@@ -13,6 +13,7 @@ import PredictionForm from "@/components/PredictionForm";
 import ResultsVisualization from "@/components/ResultsVisualization";
 import FeatureImportance from "@/components/FeatureImportance";
 import ModelVersions from "@/components/ModelVersions";
+import ModelSaveLoad from "@/components/ModelSaveLoad";
 import { toast } from "sonner";
 
 import { ResearchData, FeatureConfig, ModelVersion } from "@/views/types";
@@ -80,6 +81,15 @@ const AITraining = () => {
     toast.success(`Loaded up model ${version.version} - throw in new data to train more`);
   };
 
+  // load a saved model file
+  const handleModelLoaded = (loadedModel: any, loadedMetrics: any, loadedImportance: any[], loadedConfig: any) => {
+    setModel(loadedModel);
+    setModelMetrics(loadedMetrics);
+    setFeatureImportance(loadedImportance);
+    setFeatureConfig(loadedConfig);
+    setTrainingData([]);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <main className="container mx-auto px-6 py-8 max-w-4xl">
@@ -118,6 +128,15 @@ const AITraining = () => {
           </TabsList>
 
           <TabsContent value="upload" className="space-y-4">
+            <div className="mb-3">
+              <ModelSaveLoad
+                model={model}
+                metrics={modelMetrics}
+                featureImportance={featureImportance}
+                featureConfig={featureConfig}
+                onModelLoaded={handleModelLoaded}
+              />
+            </div>
             <FileUpload onDataLoaded={handleDataUpload} />
             {trainingData.length > 0 && featureConfig && (
               <DataPreview data={trainingData} featureConfig={featureConfig} />
@@ -134,6 +153,17 @@ const AITraining = () => {
             />
             {featureImportance.length > 0 && (
               <FeatureImportance data={featureImportance} />
+            )}
+            {model && (
+              <div className="pt-2">
+                <ModelSaveLoad
+                  model={model}
+                  metrics={modelMetrics}
+                  featureImportance={featureImportance}
+                  featureConfig={featureConfig}
+                  onModelLoaded={handleModelLoaded}
+                />
+              </div>
             )}
           </TabsContent>
 
