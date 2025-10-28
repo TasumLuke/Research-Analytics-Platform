@@ -1,4 +1,4 @@
-// wire up all the providers and routing stuff
+// setting up all the routing and stuff
 import { PopupMessages } from "@/bits/popup-messages";
 import { Toaster as QuickMessages } from "@/components/user-interface/sonner";
 import { TooltipProvider } from "@/components/user-interface/tooltip";
@@ -9,17 +9,17 @@ import ModelTrainer from "./views/ModelTrainer";
 import StatsLab from "./views/StatsLab";
 import NotFound from "./views/NotFound";
 
-// set up react query for data fetching
-const dataClient = new QueryClient();
+// gotta have react query for fetching stuff
+const queryClient = new QueryClient();
 
 const AppSetup = () => (
-  <QueryClientProvider client={dataClient}>
+  <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      {/* popup notification systems */}
+      {/* notifications and toasts */}
       <PopupMessages />
       <QuickMessages />
       
-      {/* main routing */}
+      {/* pages */}
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<LandingPage />} />
