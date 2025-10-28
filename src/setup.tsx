@@ -9,7 +9,7 @@ import ModelTrainer from "./views/ModelTrainer";
 import StatsLab from "./views/StatsLab";
 import NotFound from "./views/NotFound";
 
-// gotta have react query for fetching stuff
+// this basically have react query for fetching stuff
 const queryClient = new QueryClient();
 
 const AppSetup = () => (
