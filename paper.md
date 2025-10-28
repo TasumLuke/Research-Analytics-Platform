@@ -15,7 +15,7 @@ authors:
     affiliation: "1, 2"
     email: rloyileg@stevens.edu
   - name: Denver Jn. Baptiste
-    orcid: 0000-0000-0000-0000
+    orcid: 0009-0006-5158-2532
     affiliation: "1, 2"
     email: djnbapti@stevens.edu
   - name: Samantha Gauthier
