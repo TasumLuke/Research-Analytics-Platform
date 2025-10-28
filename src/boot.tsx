@@ -1,8 +1,8 @@
-// kick things off - entry point for the whole app
+// just booting up the app here
 import { createRoot } from "react-dom/client";
 import AppSetup from "./setup.tsx";
 import "./styles.css";
 
-// grab the root div and mount our app
-const rootElement = document.getElementById("root")!;
-createRoot(rootElement).render(<AppSetup />);
+// find that div and render everything
+const rootEl = document.getElementById("root")!;
+createRoot(rootEl).render(<AppSetup />);
