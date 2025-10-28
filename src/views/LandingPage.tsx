@@ -1,17 +1,18 @@
-// main landing page
-// ui components from https://www.shadcn.io/template (open source)
+// home page where you pick what to do
+// using shadcn ui components - https://www.shadcn.io/template
 import { useNavigate } from "react-router-dom";
 import { Brain, BarChart3 } from "lucide-react";
 import { Card } from "@/components/user-interface/card";
 import { Button } from "@/components/user-interface/button";
 import logo from "@/assets/stevens-logo.png";
+
 const LandingPage = () => {
-  const goTo = useNavigate();
+  const nav = useNavigate();
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <main className="container mx-auto px-6 py-12 flex-1">
-        {/* logo and title */}
+        {/* header stuff */}
         <div className="text-center mb-12">
           <img 
             src={logo}
@@ -22,16 +23,16 @@ const LandingPage = () => {
             Research Analytics
           </h1>
           <p className="text-base text-muted-foreground">
-            Select workflow
+            Pick what you wanna do
           </p>
         </div>
 
-        {/* the two main options - kept it simple */}
+        {/* two main options */}
         <div className="grid md:grid-cols-2 gap-5 max-w-3xl mx-auto">
-          {/* model training card */}
+          {/* training models */}
           <Card 
             className="p-5 cursor-pointer hover:border-primary"
-            onClick={() => goTo("/train-model")}
+            onClick={() => nav("/train-model")}
           >
             <div className="space-y-3">
               <Brain className="w-7 h-7 text-primary mb-2" />
@@ -49,10 +50,10 @@ const LandingPage = () => {
             </div>
           </Card>
 
-          {/* data analysis card */}
+          {/* analyzing data */}
           <Card 
             className="p-5 cursor-pointer hover:border-primary"
-            onClick={() => goTo("/analyze-data")}
+            onClick={() => nav("/analyze-data")}
           >
             <div className="space-y-3">
               <BarChart3 className="w-7 h-7 text-primary mb-2" />
@@ -72,14 +73,14 @@ const LandingPage = () => {
         </div>
       </main>
 
-      {/* footer */}
+      {/* bottom credits */}
       <footer className="border-t border-border py-6 mt-12">
         <div className="container mx-auto px-6 text-center space-y-2">
           <p className="text-sm text-muted-foreground">
-            Created by Luke Rimmo Lego, Samantha Gauthier & Dr. Denver Baptiste
+            Made by Luke Rimmo Lego & Dr. Denver Baptiste
           </p>
           <p className="text-xs text-muted-foreground">
-            UI components from <a href="https://www.shadcn.io/template" target="_blank" rel="noopener noreferrer" className="underline">shadcn/ui</a>
+            UI from <a href="https://www.shadcn.io/template" target="_blank" rel="noopener noreferrer" className="underline">shadcn/ui</a>
           </p>
         </div>
       </footer>

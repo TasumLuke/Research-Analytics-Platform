@@ -1,4 +1,4 @@
-// shows a preview of uploaded data with stats
+// data preview with some stats
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/user-interface/table";
 import { Card } from "@/components/user-interface/card";
 import { Badge } from "@/components/user-interface/badge";
@@ -10,40 +10,40 @@ interface DataPreviewProps {
 }
 
 const DataPreview = ({ data, featureConfig }: DataPreviewProps) => {
-  // calculate basic stats for a column
-  const calculateStats = (column: string) => {
-    const values = data.map(row => row[column]).filter(v => v !== null && v !== undefined);
+  // calc stats for each column
+  const getStats = (col: string) => {
+    const vals = data.map(row => row[col]).filter(v => v !== null && v !== undefined);
     
-    if (featureConfig.featureTypes[column] === 'numeric') {
-      // numeric column - calculate mean, median, etc
-      const numericValues = values.filter(v => typeof v === 'number') as number[];
-      const mean = numericValues.reduce((a, b) => a + b, 0) / numericValues.length;
-      const sorted = [...numericValues].sort((a, b) => a - b);
-      const median = sorted.length % 2 === 0
+    if (featureConfig.featureTypes[col] === 'numeric') {
+      // numbers - do mean, median etc
+      const nums = vals.filter(v => typeof v === 'number') as number[];
+      const avg = nums.reduce((a, b) => a + b, 0) / nums.length;
+      const sorted = [...nums].sort((a, b) => a - b);
+      const med = sorted.length % 2 === 0
         ? (sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2
         : sorted[Math.floor(sorted.length / 2)];
-      const variance = numericValues.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / numericValues.length;
-      const std = Math.sqrt(variance);
-      const min = Math.min(...numericValues);
-      const max = Math.max(...numericValues);
+      const variance = nums.reduce((sum, val) => sum + Math.pow(val - avg, 2), 0) / nums.length;
+      const stdDev = Math.sqrt(variance);
+      const minVal = Math.min(...nums);
+      const maxVal = Math.max(...nums);
 
-      return { type: 'numeric', mean: mean.toFixed(3), median: median.toFixed(3), std: std.toFixed(3), min: min.toFixed(3), max: max.toFixed(3), count: numericValues.length };
+      return { type: 'numeric', mean: avg.toFixed(3), median: med.toFixed(3), std: stdDev.toFixed(3), min: minVal.toFixed(3), max: maxVal.toFixed(3), count: nums.length };
     } else {
-      // categorical column - count unique values
+      // text - count unique
       const counts: { [key: string]: number } = {};
-      values.forEach(v => {
-        const key = String(v);
-        counts[key] = (counts[key] || 0) + 1;
+      vals.forEach(v => {
+        const k = String(v);
+        counts[k] = (counts[k] || 0) + 1;
       });
-      const uniqueValues = Object.keys(counts).length;
-      const mostCommon = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
+      const uniq = Object.keys(counts).length;
+      const top = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
 
-      return { type: 'categorical', unique: uniqueValues, mostCommon: mostCommon?.[0] || 'N/A', mostCommonCount: mostCommon?.[1] || 0, count: values.length };
+      return { type: 'categorical', unique: uniq, mostCommon: top?.[0] || 'N/A', mostCommonCount: top?.[1] || 0, count: vals.length };
     }
   };
 
-  const allColumns = [...featureConfig.features, featureConfig.target];
-  const statsData = allColumns.map(col => ({ column: col, stats: calculateStats(col) }));
+  const allCols = [...featureConfig.features, featureConfig.target];
+  const statsData = allCols.map(col => ({ column: col, stats: getStats(col) }));
 
   return (
     <div className="space-y-4">
@@ -87,7 +87,7 @@ const DataPreview = ({ data, featureConfig }: DataPreviewProps) => {
             <TableHeader>
               <TableRow>
                 <TableHead className="h-8 text-xs">#</TableHead>
-                {allColumns.map((col) => (
+                {allCols.map((col) => (
                   <TableHead key={col} className="h-8 text-xs whitespace-nowrap">
                     {col}
                   </TableHead>
@@ -98,7 +98,7 @@ const DataPreview = ({ data, featureConfig }: DataPreviewProps) => {
               {data.slice(0, 5).map((row, idx) => (
                 <TableRow key={idx}>
                   <TableCell className="text-xs">{idx + 1}</TableCell>
-                  {allColumns.map((col) => (
+                  {allCols.map((col) => (
                     <TableCell key={col} className="font-mono text-xs">
                       {typeof row[col] === 'number' ? (row[col] as number).toFixed(2) : String(row[col])}
                     </TableCell>

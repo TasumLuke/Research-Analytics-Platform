@@ -1,4 +1,4 @@
-// component for uploading and configuring CSV files
+// csv upload and setup
 import { useState } from "react";
 import { Button } from "@/components/user-interface/button";
 import { Card } from "@/components/user-interface/card";
@@ -14,155 +14,155 @@ interface FileUploadProps {
 }
 
 const FileUpload = ({ onDataLoaded }: FileUploadProps) => {
-  // track drag and drop state
-  const [isDragging, setIsDragging] = useState(false);
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  // drag and drop stuff
+  const [dragging, setDragging] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
   
-  // store parsed csv data
-  const [csvData, setCsvData] = useState<ResearchData[]>([]);
-  const [columns, setColumns] = useState<string[]>([]);
+  // parsed data
+  const [parsedData, setParsedData] = useState<ResearchData[]>([]);
+  const [cols, setCols] = useState<string[]>([]);
   
-  // user selections for model
-  const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
-  const [targetVariable, setTargetVariable] = useState<string>("");
-  const [featureTypes, setFeatureTypes] = useState<{ [key: string]: 'numeric' | 'categorical' }>({});
-  const [showConfiguration, setShowConfiguration] = useState(false);
+  // what user picked
+  const [pickedFeatures, setPickedFeatures] = useState<string[]>([]);
+  const [target, setTarget] = useState<string>("");
+  const [types, setTypes] = useState<{ [key: string]: 'numeric' | 'categorical' }>({});
+  const [showConfig, setShowConfig] = useState(false);
 
-  // user drags a file over
-  const handleDrop = (e: React.DragEvent) => {
+  // when they drop a file
+  const onDrop = (e: React.DragEvent) => {
     e.preventDefault();
-    setIsDragging(false);
-    const file = e.dataTransfer.files[0];
-    if (file && file.type === "text/csv") {
-      processFile(file);
+    setDragging(false);
+    const droppedFile = e.dataTransfer.files[0];
+    if (droppedFile && droppedFile.type === "text/csv") {
+      parseFile(droppedFile);
     } else {
-      toast.error("Please upload a CSV file");
+      toast.error("Need a CSV file");
     }
   };
 
-  // user clicks browse button
-  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      processFile(file);
+  // when they click browse
+  const onFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (selectedFile) {
+      parseFile(selectedFile);
     }
   };
 
-  // parse the csv file
-  const processFile = (file: File) => {
-    setUploadedFile(file);
-    Papa.parse(file, {
+  // parse csv
+  const parseFile = (csvFile: File) => {
+    setFile(csvFile);
+    Papa.parse(csvFile, {
       header: true,
       dynamicTyping: true,
       skipEmptyLines: true,
       complete: (results) => {
         const data = results.data as ResearchData[];
         if (data.length === 0) {
-          toast.error("CSV file is empty");
+          toast.error("File is empty");
           return;
         }
 
-        // get column names from first row
-        const cols = Object.keys(data[0]);
-        setCsvData(data);
-        setColumns(cols);
+        // grab columns
+        const columns = Object.keys(data[0]);
+        setParsedData(data);
+        setCols(columns);
         
-        // figure out if each column is number or text
-        const types: { [key: string]: 'numeric' | 'categorical' } = {};
-        cols.forEach(col => {
-          const firstValue = data[0][col];
-          types[col] = typeof firstValue === 'number' ? 'numeric' : 'categorical';
+        // check if numeric or not
+        const colTypes: { [key: string]: 'numeric' | 'categorical' } = {};
+        columns.forEach(col => {
+          const val = data[0][col];
+          colTypes[col] = typeof val === 'number' ? 'numeric' : 'categorical';
         });
-        setFeatureTypes(types);
+        setTypes(colTypes);
         
-        setShowConfiguration(true);
-        toast.success(`CSV loaded: ${data.length} rows, ${cols.length} columns`);
+        setShowConfig(true);
+        toast.success(`Loaded ${data.length} rows, ${columns.length} cols`);
       },
-      error: (error) => {
-        toast.error(`Error parsing CSV: ${error.message}`);
+      error: (err) => {
+        toast.error(`Parse error: ${err.message}`);
       },
     });
   };
 
-  // add or remove a feature from selection
-  const handleFeatureToggle = (feature: string) => {
-    setSelectedFeatures(prev =>
-      prev.includes(feature) ? prev.filter(f => f !== feature) : [...prev, feature]
+  // toggle feature selection
+  const toggleFeature = (feat: string) => {
+    setPickedFeatures(prev =>
+      prev.includes(feat) ? prev.filter(f => f !== feat) : [...prev, feat]
     );
   };
 
-  // user clicks confirm button
-  const handleConfirm = () => {
-    // make sure they picked stuff
-    if (selectedFeatures.length === 0) {
-      toast.error("Please select at least one feature");
+  // confirm and send data up
+  const confirm = () => {
+    // validation
+    if (pickedFeatures.length === 0) {
+      toast.error("Pick at least one feature");
       return;
     }
-    if (!targetVariable) {
-      toast.error("Please select a target variable to predict");
+    if (!target) {
+      toast.error("Pick a target variable");
       return;
     }
-    if (selectedFeatures.includes(targetVariable)) {
-      toast.error("Target variable cannot be a feature");
+    if (pickedFeatures.includes(target)) {
+      toast.error("Target can't be a feature");
       return;
     }
 
-    // bundle it all up
-    const config: FeatureConfig = {
-      features: selectedFeatures,
-      target: targetVariable,
-      featureTypes: featureTypes,
+    // make config
+    const cfg: FeatureConfig = {
+      features: pickedFeatures,
+      target: target,
+      featureTypes: types,
     };
 
-    onDataLoaded(csvData, config);
+    onDataLoaded(parsedData, cfg);
   };
 
   return (
     <Card className="p-4">
-      {!showConfiguration ? (
+      {!showConfig ? (
         <>
           <div
             onDragOver={(e) => {
               e.preventDefault();
-              setIsDragging(true);
+              setDragging(true);
             }}
-            onDragLeave={() => setIsDragging(false)}
-            onDrop={handleDrop}
+            onDragLeave={() => setDragging(false)}
+            onDrop={onDrop}
             className={`border border-dashed rounded p-8 text-center transition-colors ${
-              isDragging ? "border-primary bg-primary/5" : "border-border"
+              dragging ? "border-primary bg-primary/5" : "border-border"
             }`}
           >
-            <p className="text-sm mb-3">Drop CSV file or</p>
+            <p className="text-sm mb-3">Drop CSV or</p>
             <Button variant="outline" size="sm" asChild>
               <label className="cursor-pointer">
                 Browse
-                <input type="file" accept=".csv" onChange={handleFileInput} className="hidden" />
+                <input type="file" accept=".csv" onChange={onFileInput} className="hidden" />
               </label>
             </Button>
           </div>
 
           <p className="text-xs text-muted-foreground mt-3">
-            CSV with headers required. Include numeric/categorical features and target variable.
+            Need CSV with headers - numeric/categorical features + target
           </p>
         </>
       ) : (
         <div className="space-y-4">
           <div className="p-3 bg-muted rounded text-sm">
-            <p className="font-medium">{uploadedFile?.name}</p>
+            <p className="font-medium">{file?.name}</p>
             <p className="text-xs text-muted-foreground">
-              {csvData.length} rows, {columns.length} columns
+              {parsedData.length} rows, {cols.length} cols
             </p>
           </div>
 
           <div className="space-y-3">
             <div>
               <Label className="text-sm mb-2 block">Target Variable</Label>
-              <Select value={targetVariable} onValueChange={setTargetVariable}>
+              <Select value={target} onValueChange={setTarget}>
                 <SelectTrigger className="h-9">
-                  <SelectValue placeholder="Select target" />
+                  <SelectValue placeholder="Pick target" />
                 </SelectTrigger>
                 <SelectContent>
-                  {columns.map((col) => (
+                  {cols.map((col) => (
                     <SelectItem key={col} value={col}>{col}</SelectItem>
                   ))}
                 </SelectContent>
@@ -170,15 +170,15 @@ const FileUpload = ({ onDataLoaded }: FileUploadProps) => {
             </div>
 
             <div>
-              <Label className="text-sm mb-2 block">Features ({selectedFeatures.length})</Label>
+              <Label className="text-sm mb-2 block">Features ({pickedFeatures.length})</Label>
               <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto p-2 border rounded">
-                {columns.map((col) => (
+                {cols.map((col) => (
                   <div key={col} className="flex items-center space-x-2">
                     <Checkbox
                       id={col}
-                      checked={selectedFeatures.includes(col)}
-                      onCheckedChange={() => handleFeatureToggle(col)}
-                      disabled={col === targetVariable}
+                      checked={pickedFeatures.includes(col)}
+                      onCheckedChange={() => toggleFeature(col)}
+                      disabled={col === target}
                     />
                     <label htmlFor={col} className="text-xs cursor-pointer truncate">
                       {col}
@@ -190,16 +190,16 @@ const FileUpload = ({ onDataLoaded }: FileUploadProps) => {
           </div>
 
           <div className="flex gap-2">
-            <Button onClick={handleConfirm} disabled={selectedFeatures.length === 0 || !targetVariable} className="flex-1" size="sm">
+            <Button onClick={confirm} disabled={pickedFeatures.length === 0 || !target} className="flex-1" size="sm">
               Confirm
             </Button>
             <Button onClick={() => {
-                setShowConfiguration(false);
-                setUploadedFile(null);
-                setCsvData([]);
-                setColumns([]);
-                setSelectedFeatures([]);
-                setTargetVariable("");
+                setShowConfig(false);
+                setFile(null);
+                setParsedData([]);
+                setCols([]);
+                setPickedFeatures([]);
+                setTarget("");
               }} variant="outline" size="sm">
               Clear
             </Button>
