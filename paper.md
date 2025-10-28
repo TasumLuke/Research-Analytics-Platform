@@ -11,7 +11,7 @@ tags:
   - React
 authors:
   - name: Rimmo Loyi Lego
-    orcid: 0000-0000-0000-0000
+    orcid: 0000-0002-1204-9325
     affiliation: "1, 2"
     email: rloyileg@stevens.edu
   - name: Denver Jn. Baptiste
