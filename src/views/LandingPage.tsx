@@ -76,7 +76,7 @@ const LandingPage = () => {
       <footer className="border-t border-border py-6 mt-12">
         <div className="container mx-auto px-6 text-center space-y-2">
           <p className="text-sm text-muted-foreground">
-            Created by Luke Rimmo Lego & Dr. Denver Baptiste
+            Created by Luke Rimmo Lego, Samantha Gauthier & Dr. Denver Baptiste
           </p>
           <p className="text-xs text-muted-foreground">
             UI components from <a href="https://www.shadcn.io/template" target="_blank" rel="noopener noreferrer" className="underline">shadcn/ui</a>
