@@ -1,10 +1,9 @@
 # Quackalyst the Research Analytics Platform
 
 *A platform for training ML models and running statistical analysis*  
-**Authors:** Luke Rimmo Lego & Dr. Denver Baptiste  
+**Authors:** Luke Rimmo Lego & Samantha Gauthier & Dr. Denver Baptiste  
 
 ---
-
 > **Note :** This README was written to make it easy for other students and early researchers to download, run, understand, and extend the project. If you carry this forward, please keep changes documented and keep the spirit of reproducibility and accessibility for research tools
 
 ---
@@ -117,7 +116,6 @@ npm test           # run tests (if present)
 
 ---
 
-
 ## 6 — Environment variables & example `.env`
 If you plan to connect to a backend or persist models remotely, create a `.env` file in the project root with keys like:
 
@@ -174,4 +172,4 @@ These are concrete tasks that anyone can pick up and implement:
 
 
 Thanks for reading, good luck  
-— Luke Rimmo Lego & Dr. Denver Baptiste 
+— Luke Rimmo Lego Samantha Gauthier & Dr. Denver Baptiste 
