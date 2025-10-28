@@ -18,6 +18,10 @@ authors:
     orcid: 0000-0000-0000-0000
     affiliation: "1, 2"
     email: djnbapti@stevens.edu
+  - name: Samantha Gauthier
+    orcid: 0000-0000-0000-0000
+    affiliation: "1, 2"
+    email: sgauthie1@stevens.edu
 affiliations:
   - name: Department of Biomedical Engineering, Charles V. Schaefer, Jr. School of Engineering and Science, Stevens Institute of Technology, Hoboken, NJ 07030, USA
     index: 1
