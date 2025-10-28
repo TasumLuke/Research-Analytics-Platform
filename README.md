@@ -1,7 +1,7 @@
 # Quackalyst the Research Analytics Platform
 
 *A platform for training ML models and running statistical analysis*  
-**Authors:** Luke Rimmo Lego & Dr. Denver Baptiste  
+**Authors:** Luke Rimmo Lego, Samantha Gauthier & Dr. Denver Baptiste  
 
 ---
 
