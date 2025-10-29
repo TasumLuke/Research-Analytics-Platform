@@ -19,7 +19,7 @@ authors:
     affiliation: "1, 2"
     email: djnbapti@stevens.edu
   - name: Samantha Gauthier
-    orcid: 0000-0000-0000-0000
+    orcid: 0009-0001-5817-2345
     affiliation: "1, 2"
     email: sgauthie1@stevens.edu
 affiliations:
