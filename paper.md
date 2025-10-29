@@ -19,14 +19,16 @@ authors:
     affiliation: "1, 2"
     email: djnbapti@stevens.edu
   - name: Samantha Gauthier
-    orcid: 0000-0000-0000-0000
-    affiliation: "1, 2"
+    orcid: 0009-0001-5817-2345
+    affiliation: "3"
     email: sgauthie1@stevens.edu
 affiliations:
   - name: Department of Biomedical Engineering, Charles V. Schaefer, Jr. School of Engineering and Science, Stevens Institute of Technology, Hoboken, NJ 07030, USA
     index: 1
   - name: Department of Chemistry and Chemical Biology, Charles V. Schaefer, Jr. School of Engineering and Science, Stevens Institute of Technology, Hoboken, NJ 07030, USA
     index: 2
+  - name: Department of Computer Science, Charles V. Schaefer, Jr. School of Engineering and Science, Stevens Institute of Technology, Hoboken, NJ 07030, USA
+    index: 3
 date: October 22, 2025
 bibliography: bibliography.bib    
 csl: apa.csl                     
