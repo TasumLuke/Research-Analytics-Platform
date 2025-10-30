@@ -43,7 +43,7 @@ This software provides a platform that combines machine learning and statistical
 
 Biological and biomedical researchers routinely need to apply machine learning and statistics to experimental data, but existing tools create significant barriers. Powerful frameworks like scikit-learn [@Pedregosa2011] and R [@RCoreTeam2023] require programming expertise that many experimental scientists lack. Tools operate in isolation—researchers must manually transfer data between separate programs for statistical testing, machine learning, and visualization, reducing efficiency and introducing errors [@Baker2016].
 
-This software addresses these gaps by providing both web-based and desktop applications that combine Random Forest classification [@Breiman2001] with standard statistical tests (t-tests, ANOVA, correlation) in one interface. The dual deployment model offers flexibility: researchers can use the browser version with no installation, or download the standalone desktop application for offline work and enhanced data privacy. Unlike Jupyter notebooks [@Kluyver2016], it requires no coding knowledge. Unlike visual tools like Orange [@Demsar2013], it includes comprehensive statistical testing alongside machine learning. The platform enables complete workflows—upload data, train models iteratively with version control, test hypotheses, generate visualizations—without switching applications or writing code.
+This software addresses these gaps by providing both web-based and desktop applications that combine Random Forest classification [@Breiman2001] with standard statistical tests (t-tests, ANOVA, correlation) in one interface. The dual deployment model offers flexibility: researchers can use the browser version with no installation, or download the standalone desktop application for offline work and enhanced data privacy. Unlike Jupyter notebooks [@Kluyver2016], it requires no coding knowledge. Unlike visual tools like Orange [@Demsar2013], it includes comprehensive statistical testing alongside machine learning. The platform enables complete workflows to upload data, train models iteratively with version control, test hypotheses, and generate visualizations, all with without switching applications or writing code.
 
 # Key Features and Implementation
 
@@ -69,7 +69,7 @@ Recognizing that most researchers lack expertise in hyperparameter tuning, the s
 
 The system performs stratified 80/20 train-test splitting to preserve class distribution, crucial for imbalanced chemical datasets. Post-training, the interface displays comprehensive performance metrics including accuracy, precision, recall, F1-score, and interactive confusion matrices. Feature importance scores computed via mean decrease in impurity reveal which molecular descriptors most influence classification, supporting interpretable model analysis. 
 
-Trained models persist in browser local storage or local file system (desktop version) with comprehensive version control. Researchers can save multiple model versions, each tagged with training timestamp, dataset characteristics, and performance metrics. This versioning system enables iterative model refinement—users can load previous versions, add new training data, and create improved versions while maintaining the training history. Models export as JSON files for deployment, sharing, or backup purposes.
+Trained models persist in browser local storage or local file system (desktop version) with comprehensive version control. Researchers can save multiple model versions, each tagged with training timestamp, dataset characteristics, and performance metrics. This versioning system enables iterative model refinement, wherein users can load previous versions, add new training data, and create improved versions while maintaining the training history. Models export as JSON files for deployment, sharing, or backup purposes.
 
 ## Statistical Analysis Tools
 
@@ -83,11 +83,7 @@ The visualization module generates publication-quality SVG charts using Recharts
 
 ## User Interface Design
 
-As shown in Figure 1, the interface employs tab-based navigation mirroring typical analysis workflows: Data Upload → Model Training → Prediction → Results → Statistical Analysis. Tabs remain disabled until prerequisite steps complete, preventing workflow errors. Form inputs include real-time validation with error messages and tooltip hints. The responsive design adapts to desktop and tablet viewports. Model management features include persistent storage (browser local storage with 5MB capacity or unlimited desktop file system), version control with timestamp metadata and performance tracking, and JSON import/export for model sharing and backup. The version history interface allows researchers to compare model performance across iterations and load any previous version for continued training or deployment.
-
-# Research Applications
-
-The platform supports prediction based on work data and trained AI, and exploratory data analysis in chemical biology. Typical applications include QSAR modeling, compound screening, and comparative analysis of experimental conditions. The integrated workflow reduces analysis time and technical barriers for laboratory researchers.
+The interface employs tab-based navigation mirroring typical analysis workflows: Data Upload → Model Training → Prediction → Results → Statistical Analysis. Tabs remain disabled until prerequisite steps complete, preventing workflow errors. Form inputs include real-time validation with error messages and tooltip hints. The responsive design adapts to desktop and tablet viewports. Model management features include persistent storage (browser local storage with 5MB capacity or unlimited desktop file system), version control with timestamp metadata and performance tracking, and JSON import/export for model sharing and backup. The version history interface allows researchers to compare model performance across iterations and load any previous version for continued training or deployment.
 
 # Acknowledgements
 
