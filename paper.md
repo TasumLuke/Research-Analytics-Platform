@@ -1,5 +1,5 @@
 ---
-title: "Automated Statistical and Machine Learning Platform for Chemical Biology Research"
+title: "Automated Statistical and Machine Learning Platform for Biology Research"
 tags:
   - JavaScript
   - TypeScript
