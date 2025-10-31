@@ -2,32 +2,14 @@
 
 *A platform for training ML models and running statistical analysis*  
 **Authors:** Luke Rimmo Lego, Samantha Gauthier & Dr. Denver Baptiste  
+This repository contains a lightweight frontend (React + TypeScript) for loading CSVs, running common statistical tests (t-test, ANOVA, chi-square), training Random Forest models with basic versioning, and visualising results with interactive charts. The UI is purposely small so students can easily understand, modify, and extend it for coursework or research prototypes.
+
 
 ---
 > **Note :** This README was written to make it easy for other students and early researchers to download, run, understand, and extend the project. If you carry this forward, please keep changes documented and keep the spirit of reproducibility and accessibility for research tools
-
 ---
 
-## Table of contents
-1. Overview  
-2. What you can do with this repo  
-3. Quick start, download, install, run locally  
-4. Git & collaboration workflow (fork / clone / PR)  
-5. Running scripts and common npm commands  
-6. Environment variables & example `.env`  
-7. Testing / linting / CI suggestions  
-8. Data & model versioning suggestions for future work  
-9. Roadmap, things future contributors can add  
-10. Troubleshooting & tips  
-
----
-
-## 1. Overview
-This repository contains a lightweight frontend (React + TypeScript) for loading CSVs, running common statistical tests (t-test, ANOVA, chi-square), training Random Forest models with basic versioning, and visualising results with interactive charts. The UI is purposely small so students can easily understand, modify, and extend it for coursework or research prototypes.
-
----
-
-## 2. What you can do with this ?
+## What you can do with this ?
 - Upload CSV datasets and preview them.  
 - Run descriptive statistics and hypothesis tests.  
 - Train Random Forest models (client-side) and view basic metrics and feature importances.  
@@ -172,4 +154,4 @@ These are concrete tasks that anyone can pick up and implement:
 
 
 Thanks for reading, good luck  
-— Luke Rimmo Lego Samantha Gauthier & Dr. Denver Baptiste 
+Luke Rimmo Lego, Samantha Gauthier & Dr. Denver Baptiste 
