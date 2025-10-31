@@ -1,5 +1,8 @@
-// model training page - where the magic happens
-// using shadcn ui - https://www.shadcn.io/template
+/**
+ * Main AI Model Training Interface
+ * Handles the full ML workflow: data upload -> training -> prediction -> results
+ * Built with shadcn/ui components
+ */
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/user-interface/tabs";
 import { Badge } from "@/components/user-interface/badge";
@@ -21,33 +24,33 @@ import { ResearchData, FeatureConfig, ModelVersion } from "@/views/types";
 const AITraining = () => {
   const nav = useNavigate();
   
-  // keeping track of all our stuff
+  // state management for the whole training pipeline
   const [data, setData] = useState<ResearchData[]>([]);
   const [config, setConfig] = useState<FeatureConfig | null>(null);
   const [trainedModel, setTrainedModel] = useState<any>(null);
-  const [preds, setPreds] = useState<any[]>([]);
-  const [metrics, setMetrics] = useState<any>(null);
-  const [importance, setImportance] = useState<any[]>([]);
-  const [versions, setVersions] = useState<ModelVersion[]>([]);
-  const [currVersion, setCurrVersion] = useState<string>("v1.0");
+  const [recentPredictions, setRecentPredictions] = useState<any[]>([]);
+  const [performanceMetrics, setPerformanceMetrics] = useState<any>(null);
+  const [featureImportanceData, setFeatureImportanceData] = useState<any[]>([]);
+  const [modelVersionHistory, setModelVersionHistory] = useState<ModelVersion[]>([]);
+  const [currentModelVersion, setCurrentModelVersion] = useState<string>("v1.0");
 
-  // when they upload data
+  // callback when user uploads training data
   const onDataUpload = (uploadedData: ResearchData[], uploadedConfig: FeatureConfig) => {
     setData(uploadedData);
     setConfig(uploadedConfig);
     toast.success(`Got ${uploadedData.length} rows with ${uploadedConfig.features.length} features`);
   };
 
-  // after training finishes
+  // callback after successful training - save model snapshot
   const onModelTrained = (model: any, modelMetrics: any, featureImportance: any[]) => {
     setTrainedModel(model);
-    setMetrics(modelMetrics);
-    setImportance(featureImportance);
+    setPerformanceMetrics(modelMetrics);
+    setFeatureImportanceData(featureImportance);
 
-    // save it
-    const newVer: ModelVersion = {
+    // create version snapshot for history tracking
+    const versionSnapshot: ModelVersion = {
       id: Date.now().toString(),
-      version: currVersion,
+      version: currentModelVersion,
       timestamp: new Date(),
       model: model,
       metrics: modelMetrics,
@@ -56,36 +59,35 @@ const AITraining = () => {
       featureConfig: config!,
     };
 
-    setVersions(prev => [newVer, ...prev]);
+    setModelVersionHistory(prev => [versionSnapshot, ...prev]);
     
-    // increment version
-    const verNum = parseFloat(currVersion.substring(1)) + 0.1;
-    setCurrVersion(`v${verNum.toFixed(1)}`);
+    // auto-increment version number (v1.0 -> v1.1 -> v1.2, etc)
+    const versionNumber = parseFloat(currentModelVersion.substring(1)) + 0.1;
+    setCurrentModelVersion(`v${versionNumber.toFixed(1)}`);
 
-    toast.success(`Model ${newVer.version} trained!`);
+    toast.success(`Model ${versionSnapshot.version} trained successfully!`);
   };
 
-  // when making predictions
-  const onPrediction = (pred: any) => {
-    // just keep the last 10
-    setPreds((prev) => [pred, ...prev].slice(0, 10));
+  // store new prediction in history (keep last 10 for performance)
+  const onPrediction = (predictionResult: any) => {
+    setRecentPredictions((prev) => [predictionResult, ...prev].slice(0, 10));
   };
 
-  // load old model version
-  const loadVersion = (ver: ModelVersion) => {
-    setTrainedModel(ver.model);
-    setMetrics(ver.metrics);
-    setImportance(ver.featureImportance);
-    setConfig(ver.featureConfig);
-    setData([]);
-    toast.success(`Loaded ${ver.version} - upload new data to keep training`);
+  // restore a previous model version from history
+  const loadVersion = (versionToLoad: ModelVersion) => {
+    setTrainedModel(versionToLoad.model);
+    setPerformanceMetrics(versionToLoad.metrics);
+    setFeatureImportanceData(versionToLoad.featureImportance);
+    setConfig(versionToLoad.featureConfig);
+    setData([]); // clear current data - user needs to upload new data to continue training
+    toast.success(`Loaded ${versionToLoad.version} - upload new data to continue training`);
   };
 
-  // load from file
+  // import model from saved file
   const onModelLoaded = (model: any, modelMetrics: any, featureImportance: any[], modelConfig: any) => {
     setTrainedModel(model);
-    setMetrics(modelMetrics);
-    setImportance(featureImportance);
+    setPerformanceMetrics(modelMetrics);
+    setFeatureImportanceData(featureImportance);
     setConfig(modelConfig);
     setData([]);
   };
@@ -100,9 +102,9 @@ const AITraining = () => {
           </Button>
           <div className="flex items-center gap-3">
             <h2 className="text-2xl font-semibold">Model Training</h2>
-            {versions.length > 0 && (
+            {modelVersionHistory.length > 0 && (
               <Badge variant="outline" className="text-xs">
-                {versions.length} version{versions.length !== 1 ? 's' : ''}
+                {modelVersionHistory.length} version{modelVersionHistory.length !== 1 ? 's' : ''}
               </Badge>
             )}
           </div>
@@ -119,10 +121,10 @@ const AITraining = () => {
             <TabsTrigger value="predict" disabled={!trainedModel} className="text-xs">
               Predict
             </TabsTrigger>
-            <TabsTrigger value="results" disabled={preds.length === 0} className="text-xs">
+            <TabsTrigger value="results" disabled={recentPredictions.length === 0} className="text-xs">
               Results
             </TabsTrigger>
-            <TabsTrigger value="versions" disabled={versions.length === 0} className="text-xs">
+            <TabsTrigger value="versions" disabled={modelVersionHistory.length === 0} className="text-xs">
               Versions
             </TabsTrigger>
           </TabsList>
@@ -131,8 +133,8 @@ const AITraining = () => {
             <div className="mb-3">
               <ModelSaveLoad
                 model={trainedModel}
-                metrics={metrics}
-                featureImportance={importance}
+                metrics={performanceMetrics}
+                featureImportance={featureImportanceData}
                 featureConfig={config}
                 onModelLoaded={onModelLoaded}
               />
@@ -148,18 +150,18 @@ const AITraining = () => {
               data={data}
               featureConfig={config!}
               onModelTrained={onModelTrained}
-              metrics={metrics}
-              currentVersion={currVersion}
+              metrics={performanceMetrics}
+              currentVersion={currentModelVersion}
             />
-            {importance.length > 0 && (
-              <FeatureImportance data={importance} />
+            {featureImportanceData.length > 0 && (
+              <FeatureImportance data={featureImportanceData} />
             )}
             {trainedModel && (
               <div className="pt-2">
                 <ModelSaveLoad
                   model={trainedModel}
-                  metrics={metrics}
-                  featureImportance={importance}
+                  metrics={performanceMetrics}
+                  featureImportance={featureImportanceData}
                   featureConfig={config}
                   onModelLoaded={onModelLoaded}
                 />
@@ -177,16 +179,16 @@ const AITraining = () => {
 
           <TabsContent value="results">
             <ResultsVisualization
-              predictions={preds}
-              metrics={metrics}
+              predictions={recentPredictions}
+              metrics={performanceMetrics}
             />
           </TabsContent>
 
           <TabsContent value="versions">
             <ModelVersions
-              versions={versions}
+              versions={modelVersionHistory}
               onLoadVersion={loadVersion}
-              currentVersion={currVersion}
+              currentVersion={currentModelVersion}
             />
           </TabsContent>
         </Tabs>
