@@ -1,10 +1,11 @@
-// main electron process, creates the app window
+/**
+ * Electron entry point - bootstraps the desktop app window
+ */
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
 
 let mainWindow;
 
-// creates the main app window
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1200,
@@ -17,13 +18,12 @@ function createWindow() {
     icon: path.join(__dirname, '../src/assets/stevens-logo.png')
   });
 
-  // in development, load from vite server
-  // in production, load from the built files
+  // dev mode? connect to vite dev server, otherwise load built files
   const startUrl = process.env.ELECTRON_START_URL || `file://${path.join(__dirname, '../dist/index.html')}`;
   
   mainWindow.loadURL(startUrl);
 
-  // open devtools in development
+  // auto-open devtools during development for easier debugging
   if (process.env.ELECTRON_START_URL) {
     mainWindow.webContents.openDevTools();
   }
@@ -33,11 +33,11 @@ function createWindow() {
   });
 }
 
-// when electron is ready, create the window
+// wait for electron to finish initialization
 app.whenReady().then(() => {
   createWindow();
 
-  // on mac, recreate window when dock icon is clicked
+  // macOS specific - recreate window when dock icon clicked (standard behavior)
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow();
@@ -45,7 +45,8 @@ app.whenReady().then(() => {
   });
 });
 
-// quit when all windows are closed (except on mac)
+// Windows/Linux behavior - quit when all windows close
+// macOS keeps app running even with no windows (standard Mac behavior)
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
