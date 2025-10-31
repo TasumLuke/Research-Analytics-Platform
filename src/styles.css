@@ -1,11 +1,14 @@
-/* basic css setup */
+/**
+ * Global styles and design tokens
+ * Using HSL color space ...  easy theme switching
+ */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    /* light theme colors */
+    /* Light mode palette */
     --background: 0 0% 98%;
     --foreground: 220 10% 25%;
     --card: 0 0% 100%;
@@ -13,11 +16,11 @@
     --popover: 0 0% 100%;
     --popover-foreground: 220 10% 25%;
     
-    /* main blue-ish teal color */
+    /* Brand color - teal/cyan theme */
     --primary: 185 65% 45%;
     --primary-foreground: 0 0% 100%;
     
-    /* secondary colors */
+    /* Supporting colors */
     --secondary: 220 10% 60%;
     --secondary-foreground: 0 0% 100%;
     --muted: 220 10% 95%;
@@ -27,12 +30,12 @@
     --destructive: 0 75% 60%;
     --destructive-foreground: 0 0% 100%;
     
-    /* borders */
+    /* UI elements */
     --border: 220 10% 88%;
     --input: 220 10% 88%;
     --ring: 185 65% 45%;
     
-    /* for charts */
+    /* Chart color palette */
     --chart-1: 185 65% 45%;
     --chart-2: 160 55% 50%;
     --chart-3: 270 55% 60%;
@@ -43,7 +46,7 @@
   }
 
   .dark {
-    /* darker theme for night */
+    /* Dark mode palette */
     --background: 220 15% 10%;
     --foreground: 220 10% 85%;
     --card: 220 13% 13%;
