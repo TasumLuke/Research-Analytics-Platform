@@ -1,4 +1,7 @@
-// csv upload and setup
+/**
+ * CSV File Upload & Configuration Component
+ * Handles file selection, parsing with PapaParse, and feature/target selection
+ */
 import { useState } from "react";
 import { Button } from "@/components/user-interface/button";
 import { Card } from "@/components/user-interface/card";
@@ -14,21 +17,21 @@ interface FileUploadProps {
 }
 
 const FileUpload = ({ onDataLoaded }: FileUploadProps) => {
-  // drag and drop stuff
-  const [dragging, setDragging] = useState(false);
-  const [file, setFile] = useState<File | null>(null);
+  // drag & drop UI state
+   const [dragging, setDragging] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   
-  // parsed data
+  // CSV parsing results
   const [parsedData, setParsedData] = useState<ResearchData[]>([]);
-  const [cols, setCols] = useState<string[]>([]);
+  const [columnNames, setColumnNames] = useState<string[]>([]);
   
-  // what user picked
-  const [pickedFeatures, setPickedFeatures] = useState<string[]>([]);
-  const [target, setTarget] = useState<string>("");
-  const [types, setTypes] = useState<{ [key: string]: 'numeric' | 'categorical' }>({});
-  const [showConfig, setShowConfig] = useState(false);
+  // user selections for ML configuration
+  const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
+  const [targetVariable, setTargetVariable] = useState<string>("");
+  const [columnTypes, setColumnTypes] = useState<{ [key: string]: 'numeric' | 'categorical' }>({});
+  const [showConfigPanel, setShowConfigPanel] = useState(false);
 
-  // when they drop a file
+  // handle drag & drop
   const onDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setDragging(false);
@@ -36,11 +39,11 @@ const FileUpload = ({ onDataLoaded }: FileUploadProps) => {
     if (droppedFile && droppedFile.type === "text/csv") {
       parseFile(droppedFile);
     } else {
-      toast.error("Need a CSV file");
+      toast.error("Please upload a CSV file");
     }
   };
 
-  // when they click browse
+  // handle file input click
   const onFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
@@ -48,9 +51,9 @@ const FileUpload = ({ onDataLoaded }: FileUploadProps) => {
     }
   };
 
-  // parse csv
+  // parse CSV using PapaParse library
   const parseFile = (csvFile: File) => {
-    setFile(csvFile);
+    setUploadedFile(csvFile);
     Papa.parse(csvFile, {
       header: true,
       dynamicTyping: true,
@@ -62,21 +65,21 @@ const FileUpload = ({ onDataLoaded }: FileUploadProps) => {
           return;
         }
 
-        // grab columns
+        // extract column headers
         const columns = Object.keys(data[0]);
         setParsedData(data);
-        setCols(columns);
+        setColumnNames(columns);
         
-        // check if numeric or not
-        const colTypes: { [key: string]: 'numeric' | 'categorical' } = {};
+        // auto-detect column types (numeric vs categorical)
+        const detectedTypes: { [key: string]: 'numeric' | 'categorical' } = {};
         columns.forEach(col => {
-          const val = data[0][col];
-          colTypes[col] = typeof val === 'number' ? 'numeric' : 'categorical';
+          const firstValue = data[0][col];
+          detectedTypes[col] = typeof firstValue === 'number' ? 'numeric' : 'categorical';
         });
-        setTypes(colTypes);
+        setColumnTypes(detectedTypes);
         
-        setShowConfig(true);
-        toast.success(`Loaded ${data.length} rows, ${columns.length} cols`);
+        setShowConfigPanel(true);
+        toast.success(`Loaded ${data.length} rows with ${columns.length} columns`);
       },
       error: (err) => {
         toast.error(`Parse error: ${err.message}`);
@@ -84,42 +87,42 @@ const FileUpload = ({ onDataLoaded }: FileUploadProps) => {
     });
   };
 
-  // toggle feature selection
-  const toggleFeature = (feat: string) => {
-    setPickedFeatures(prev =>
-      prev.includes(feat) ? prev.filter(f => f !== feat) : [...prev, feat]
+  // toggle feature in selection list
+  const toggleFeature = (featureName: string) => {
+    setSelectedFeatures(prev =>
+      prev.includes(featureName) ? prev.filter(f => f !== featureName) : [...prev, featureName]
     );
   };
 
-  // confirm and send data up
+  // validate and submit configuration
   const confirm = () => {
-    // validation
-    if (pickedFeatures.length === 0) {
-      toast.error("Pick at least one feature");
+    // basic validation checks
+    if (selectedFeatures.length === 0) {
+      toast.error("Please select at least one feature");
       return;
     }
-    if (!target) {
-      toast.error("Pick a target variable");
+    if (!targetVariable) {
+      toast.error("Please select a target variable");
       return;
     }
-    if (pickedFeatures.includes(target)) {
-      toast.error("Target can't be a feature");
+    if (selectedFeatures.includes(targetVariable)) {
+      toast.error("Target variable cannot also be a feature");
       return;
     }
 
-    // make config
-    const cfg: FeatureConfig = {
-      features: pickedFeatures,
-      target: target,
-      featureTypes: types,
+    // build configuration object
+    const featureConfiguration: FeatureConfig = {
+      features: selectedFeatures,
+      target: targetVariable,
+      featureTypes: columnTypes,
     };
 
-    onDataLoaded(parsedData, cfg);
+    onDataLoaded(parsedData, featureConfiguration);
   };
 
   return (
     <Card className="p-4">
-      {!showConfig ? (
+      {!showConfigPanel ? (
         <>
           <div
             onDragOver={(e) => {
@@ -148,21 +151,21 @@ const FileUpload = ({ onDataLoaded }: FileUploadProps) => {
       ) : (
         <div className="space-y-4">
           <div className="p-3 bg-muted rounded text-sm">
-            <p className="font-medium">{file?.name}</p>
+            <p className="font-medium">{uploadedFile?.name}</p>
             <p className="text-xs text-muted-foreground">
-              {parsedData.length} rows, {cols.length} cols
+              {parsedData.length} rows, {columnNames.length} columns
             </p>
           </div>
 
           <div className="space-y-3">
             <div>
               <Label className="text-sm mb-2 block">Target Variable</Label>
-              <Select value={target} onValueChange={setTarget}>
+              <Select value={targetVariable} onValueChange={setTargetVariable}>
                 <SelectTrigger className="h-9">
-                  <SelectValue placeholder="Pick target" />
+                  <SelectValue placeholder="Select target" />
                 </SelectTrigger>
                 <SelectContent>
-                  {cols.map((col) => (
+                  {columnNames.map((col) => (
                     <SelectItem key={col} value={col}>{col}</SelectItem>
                   ))}
                 </SelectContent>
@@ -170,15 +173,15 @@ const FileUpload = ({ onDataLoaded }: FileUploadProps) => {
             </div>
 
             <div>
-              <Label className="text-sm mb-2 block">Features ({pickedFeatures.length})</Label>
+              <Label className="text-sm mb-2 block">Features ({selectedFeatures.length} selected)</Label>
               <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto p-2 border rounded">
-                {cols.map((col) => (
+                {columnNames.map((col) => (
                   <div key={col} className="flex items-center space-x-2">
                     <Checkbox
                       id={col}
-                      checked={pickedFeatures.includes(col)}
+                      checked={selectedFeatures.includes(col)}
                       onCheckedChange={() => toggleFeature(col)}
-                      disabled={col === target}
+                      disabled={col === targetVariable}
                     />
                     <label htmlFor={col} className="text-xs cursor-pointer truncate">
                       {col}
@@ -190,18 +193,18 @@ const FileUpload = ({ onDataLoaded }: FileUploadProps) => {
           </div>
 
           <div className="flex gap-2">
-            <Button onClick={confirm} disabled={pickedFeatures.length === 0 || !target} className="flex-1" size="sm">
-              Confirm
+            <Button onClick={confirm} disabled={selectedFeatures.length === 0 || !targetVariable} className="flex-1" size="sm">
+              Confirm Configuration
             </Button>
             <Button onClick={() => {
-                setShowConfig(false);
-                setFile(null);
+                setShowConfigPanel(false);
+                setUploadedFile(null);
                 setParsedData([]);
-                setCols([]);
-                setPickedFeatures([]);
-                setTarget("");
+                setColumnNames([]);
+                setSelectedFeatures([]);
+                setTargetVariable("");
               }} variant="outline" size="sm">
-              Clear
+              Reset
             </Button>
           </div>
         </div>
