@@ -2,6 +2,7 @@
 
 *A platform for training ML models and running statistical analysis*  
 **Authors:** Luke Rimmo Lego, Samantha Gauthier & Dr. Denver Baptiste  
+
 This repository contains a lightweight frontend (React + TypeScript) for loading CSVs, running common statistical tests (t-test, ANOVA, chi-square), training Random Forest models with basic versioning, and visualising results with interactive charts. The UI is purposely small so students can easily understand, modify, and extend it for coursework or research prototypes.
 
 
@@ -18,7 +19,7 @@ This repository contains a lightweight frontend (React + TypeScript) for loading
 
 ---
 
-## 3. Quick start : download, install, run locally
+## Quick start : download, install, run locally
 
 ### Prerequisites
 - Node.js (LTS recommended; Node 18+ is a safe baseline).  
@@ -49,7 +50,7 @@ If the app uses Vite/Parcel/webpack, adjust `npm run dev` command if your projec
 
 ---
 
-## 4. Git & collaboration workflow 
+## Git & collaboration workflow 
 If you want to contribute to the project or work in a team, follow this simple GitHub workflow:
 
 ```bash
@@ -82,7 +83,7 @@ git config --global core.autocrlf true
 
 ---
 
-## 5. NPM scripts & common commands
+## NPM scripts & common commands
 Typical useful commands you will find in `package.json`:
 
 ```bash
@@ -98,7 +99,7 @@ npm test           # run tests (if present)
 
 ---
 
-## 6. Environment variables & example `.env`
+## Environment variables & example `.env`
 If you plan to connect to a backend or persist models remotely, create a `.env` file in the project root with keys like:
 
 ```
@@ -115,26 +116,7 @@ cp .env.example .env
 
 ---
 
-## 7. Testing, linting & CI
-Some suggestions to keep the codebase healthy:
-- Use `vitest` or `jest` for unit tests.
-- Use `ESLint` + TypeScript rules and `Prettier` for formatting.
-- Add `husky` pre-commit hooks to run `npm run lint` and a subset of tests.
-- Add a GitHub Actions workflow to run `npm ci`, `npm run lint`, `npm test`, and `npm run build` on pull requests.
-
-Example workflow file is included in this repo
-
----
-
-## 8. Data & model versioning (advice for future work)
-For a student project we provide simple client-side timestamped JSON versions. If you push this forward, consider:
-- Using DVC (Data Version Control) or MLflow for dataset + model tracking.
-- Persisting artifacts to object storage (S3, MinIO).
-- Storing environment metadata (OS, Node/Python versions, package-lock hash, dataset checksum) with each model run.
-
----
-
-## 9. Roadmap: things future contributors can add
+## Roadmap: things future contributors can add
 These are concrete tasks that anyone can pick up and implement:
 - Add server-side training (FastAPI or Flask) to handle large datasets and async training.
 - Add cross-validation and more model types (XGBoost, LightGBM).
@@ -147,7 +129,7 @@ These are concrete tasks that anyone can pick up and implement:
 
 ---
 
-## 10. Troubleshooting & tips 
+## Troubleshooting & tips 
 - If `npm run dev` shows port conflict, check which process holds the port and kill it, or change the port in `vite.config.js`.  
 - Large CSVs in-browser cause memory issues; add server-side ingestion for >50MB datasets.  
 - If metrics look wrong, confirm correct encoding of categorical labels and that missing values were handled.
