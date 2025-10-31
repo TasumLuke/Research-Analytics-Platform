@@ -1,4 +1,9 @@
-// setting up all the routing and stuff
+/**
+ * App configuration and routing setup
+ * Using HashRouter because this is to be packaged  as an Electron app
+ * (file:// protocol doesn't work with BrowserRouter)
+ */
+//all rvuting stuff
 import { PopupMessages } from "@/bits/popup-messages";
 import { Toaster as QuickMessages } from "@/components/user-interface/sonner";
 import { TooltipProvider } from "@/components/user-interface/tooltip";
@@ -9,22 +14,20 @@ import ModelTrainer from "./views/ModelTrainer";
 import StatsLab from "./views/StatsLab";
 import NotFound from "./views/NotFound";
 
-// gotta have react query for fetching stuff
+// react-query client for async state management
 const queryClient = new QueryClient();
 
 const AppSetup = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      {/* notifications and toasts */}
       <PopupMessages />
       <QuickMessages />
       
-      {/* pages */}
       <HashRouter>
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/train-model" element={<ModelTrainer />} />
-          <Route path="/analyze-data" element={<StatsLab />} />
+        <Route path="/analyze-data" element={<StatsLab />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </HashRouter>
