@@ -1,4 +1,8 @@
-// handles the actual model training process
+/**
+ * Random Forest Model Training Component
+ * Handles data preprocessing, training, evaluation, and feature importance calculation
+ * Auto-optimizes hyperparameters based on dataset size
+ */
 import { useState } from "react";
 import { Brain, Play, CheckCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/user-interface/button";
@@ -18,272 +22,283 @@ interface ModelTrainingProps {
 }
 
 const ModelTraining = ({ data, featureConfig, onModelTrained, metrics, currentVersion }: ModelTrainingProps) => {
-  // training status
+  // training progress tracking
   const [isTraining, setIsTraining] = useState(false);
-  const [trainingStep, setTrainingStep] = useState("");
-  const [optimizedParams, setOptimizedParams] = useState<any>(null);
+   const [currentStep, setCurrentStep] = useState("");
+   const [hyperparameters, setHyperparameters] = useState<any>(null);
 
-  // figure out best settings based on data size
+  /**
+   * Auto-optimize Random Forest hyperparameters based on dataset characteristics
+   * Considers dataset size and number of features to balance performance vs accuracy
+   */
   const optimizeHyperparameters = () => {
     const datasetSize = data.length;
-    const numFeatures = featureConfig.features.length;
+    const featureCount = featureConfig.features.length;
 
-    // default settings
-    let nTrees = 100;
-    let maxDepth = 10;
-    let minSamples = 2;
+    // baseline hyperparameters
+    let numberOfTrees = 100;
+    let maxTreeDepth = 10;
+    let minSamplesPerLeaf = 2;
 
-    // adjust based on how much data we have
+    // scale based on dataset size (smaller datasets need less complexity)
     if (datasetSize < 100) {
-      nTrees = 50;
-      maxDepth = 5;
-      minSamples = 3;
+      numberOfTrees = 50;
+       maxTreeDepth = 5;
+      minSamplesPerLeaf = 3;
     } else if (datasetSize < 500) {
-      nTrees = 100;
-      maxDepth = 8;
-      minSamples = 2;
+      numberOfTrees = 100;
+      maxTreeDepth = 8;
+      minSamplesPerLeaf = 2;
     } else if (datasetSize < 1000) {
-      nTrees = 150;
-      maxDepth = 12;
-      minSamples = 2;
+      numberOfTrees = 150;
+      maxTreeDepth = 12;
+      minSamplesPerLeaf = 2;
     } else {
-      nTrees = 200;
-      maxDepth = 15;
-      minSamples = 3;
+      numberOfTrees = 200;
+      maxTreeDepth = 15;
+      minSamplesPerLeaf = 3;
     }
 
-    // more features need deeper trees
-    if (numFeatures > 10) {
-      maxDepth = Math.min(maxDepth + 3, 20);
-      nTrees = Math.min(nTrees + 50, 250);
+    // high-dimensional data benefits from deeper trees and more estimators
+    if (featureCount > 10) {
+      maxTreeDepth = Math.min(maxTreeDepth + 3, 20);
+      numberOfTrees = Math.min(numberOfTrees + 50, 250);
     }
 
-    return { nTrees, maxDepth, minSamples };
+    return { nTrees: numberOfTrees, maxDepth: maxTreeDepth, minSamples: minSamplesPerLeaf };
   };
 
-  // the main training function
+  /**
+   * Main training pipeline - preprocesses data, trains Random Forest, evaluates performance
+   */
   const trainModel = async () => {
-    // need enough data to train properly
+    // minimum dataset size check
     if (data.length < 10) {
-      toast.error("Hey, need at least 10 rows to train this thing");
+      toast.error("Need at least 10 samples to train a reliable model");
       return;
     }
 
     setIsTraining(true);
-    setTrainingStep("Starting training...");
+    setCurrentStep("Initializing training...");
 
     const params = optimizeHyperparameters();
-    setOptimizedParams(params);
+    setHyperparameters(params);
 
     try {
-      // step 1: prepare the data
-      setTrainingStep("Preparing data...");
+      // STEP 1: Data preprocessing and encoding
+      setCurrentStep("Preparing data...");
       
-      // convert text to numbers for categorical stuff
-      const encodingMaps: { [key: string]: { [key: string]: number } } = {};
-      const featureStats: { [key: string]: { mean: number; std: number } } = {};
+      // maps for categorical encoding and normalization stats
+      const categoricalEncodings: { [key: string]: { [key: string]: number } } = {};
+      const numericStats: { [key: string]: { mean: number; std: number } } = {};
       
-      featureConfig.features.forEach(feature => {
-        if (featureConfig.featureTypes[feature] === 'categorical') {
-          // map each unique value to a number
-          const uniqueValues = [...new Set(data.map(row => String(row[feature] || 'unknown')))];
-          const map: { [key: string]: number } = {};
-          uniqueValues.forEach((value, idx) => {
-            map[value] = idx;
+      featureConfig.features.forEach(featureName => {
+        if (featureConfig.featureTypes[featureName] === 'categorical') {
+          // label encoding: map each unique category to an integer
+          const uniqueCategories = [...new Set(data.map(row => String(row[featureName] || 'unknown')))];
+          const encodingMap: { [key: string]: number } = {};
+          uniqueCategories.forEach((category, index) => {
+            encodingMap[category] = index;
           });
-          encodingMaps[feature] = map;
+          categoricalEncodings[featureName] = encodingMap;
         } else {
-          // calculate mean and standard deviation for numeric features
-          const values = data.map(row => Number(row[feature]) || 0);
-          const mean = values.reduce((a, b) => a + b, 0) / values.length;
+          // z-score normalization for numeric features
+          const values = data.map(row => Number(row[featureName]) || 0);
+          const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
           const variance = values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length;
-          const std = Math.sqrt(variance);
-          featureStats[feature] = { mean, std: std || 1 };
+          const stdDev = Math.sqrt(variance);
+          numericStats[featureName] = { mean, std: stdDev || 1 }; // prevent division by zero
         }
       });
 
-      // step 2: turn all features into numbers and normalize them
-      setTrainingStep("Encoding features...");
-      const features = data.map(row => 
-        featureConfig.features.map(feature => {
-          const value = row[feature];
-          if (featureConfig.featureTypes[feature] === 'categorical') {
-            const strValue = String(value || 'unknown');
-            return encodingMaps[feature][strValue] ?? 0;
+      // STEP 2: Feature encoding and normalization
+      setCurrentStep("Encoding and normalizing features...");
+      const featureMatrix = data.map(row => 
+        featureConfig.features.map(featureName => {
+          const rawValue = row[featureName];
+          if (featureConfig.featureTypes[featureName] === 'categorical') {
+            const stringValue = String(rawValue || 'unknown');
+            return categoricalEncodings[featureName][stringValue] ?? 0;
           } else {
-            const numValue = Number(value) || 0;
-            const { mean, std } = featureStats[feature];
-            return (numValue - mean) / std; // normalize
+            const numericValue = Number(rawValue) || 0;
+            const { mean, std } = numericStats[featureName];
+            return (numericValue - mean) / std; // standardize to z-scores
           }
         })
       );
 
-      // step 3: prepare the target labels
-      setTrainingStep("Processing target variable...");
-      let labels: number[];
-      let targetEncoding: { [key: string]: number } = {};
+      // STEP 3: Target variable preparation
+      setCurrentStep("Processing target variable...");
+      let targetLabels: number[];
+      let targetLabelMapping: { [key: string]: number } = {};
 
       if (featureConfig.featureTypes[featureConfig.target] === 'categorical') {
-        // categorical target - just map to numbers
-        const uniqueTargets = [...new Set(data.map(row => String(row[featureConfig.target] || 'unknown')))];
-        if (uniqueTargets.length < 2) {
-          throw new Error("Target variable must have at least 2 unique values");
+        // categorical classification
+        const uniqueClasses = [...new Set(data.map(row => String(row[featureConfig.target] || 'unknown')))];
+        if (uniqueClasses.length < 2) {
+          throw new Error("Target variable needs at least 2 distinct classes");
         }
-        uniqueTargets.forEach((value, idx) => {
-          targetEncoding[value] = idx;
+        uniqueClasses.forEach((className, classIndex) => {
+          targetLabelMapping[className] = classIndex;
         });
-        labels = data.map(row => targetEncoding[String(row[featureConfig.target] || 'unknown')]);
+        targetLabels = data.map(row => targetLabelMapping[String(row[featureConfig.target] || 'unknown')]);
       } else {
-        // numeric target - split at median
-        const numericTargets = data.map(row => Number(row[featureConfig.target]) || 0);
-        const sorted = [...numericTargets].sort((a, b) => a - b);
-        const median = sorted[Math.floor(sorted.length / 2)];
-        labels = numericTargets.map(val => (val > median ? 1 : 0));
-        targetEncoding = { 
-          [`> ${median.toFixed(3)}`]: 1, 
-          [`≤ ${median.toFixed(3)}`]: 0 
+        // numeric target - binarize at median for classification
+        const numericTargetValues = data.map(row => Number(row[featureConfig.target]) || 0);
+        const sortedValues = [...numericTargetValues].sort((a, b) => a - b);
+        const medianValue = sortedValues[Math.floor(sortedValues.length / 2)];
+        targetLabels = numericTargetValues.map(val => (val > medianValue ? 1 : 0));
+        targetLabelMapping = { 
+          [`> ${medianValue.toFixed(3)}`]: 1, 
+          [`≤ ${medianValue.toFixed(3)}`]: 0 
         };
       }
 
-      // step 4: shuffle data randomly using fisher-yates algorithm
-      setTrainingStep("Shuffling data...");
-      const indices = Array.from({ length: data.length }, (_, i) => i);
-      for (let i = indices.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [indices[i], indices[j]] = [indices[j], indices[i]];
+      // STEP 4: Train/test split with Fisher-Yates shuffle
+      setCurrentStep("Creating train/test split...");
+      const sampleIndices = Array.from({ length: data.length }, (_, idx) => idx);
+      // Fisher-Yates shuffle for randomization
+      for (let i = sampleIndices.length - 1; i > 0; i--) {
+        const randomIndex = Math.floor(Math.random() * (i + 1));
+        [sampleIndices[i], sampleIndices[randomIndex]] = [sampleIndices[randomIndex], sampleIndices[i]];
       }
 
-      // split 80/20 for train/test
-      const splitIdx = Math.floor(data.length * 0.8);
-      const trainIndices = indices.slice(0, splitIdx);
-      const testIndices = indices.slice(splitIdx);
+      // 80/20 split for training/testing
+      const splitIndex = Math.floor(data.length * 0.8);
+      const trainingIndices = sampleIndices.slice(0, splitIndex);
+      const testingIndices = sampleIndices.slice(splitIndex);
 
-      const trainX = trainIndices.map(i => features[i]);
-      const trainY = trainIndices.map(i => labels[i]);
-      const testX = testIndices.map(i => features[i]);
-      const testY = testIndices.map(i => labels[i]);
+      const X_train = trainingIndices.map(i => featureMatrix[i]);
+      const y_train = trainingIndices.map(i => targetLabels[i]);
+      const X_test = testingIndices.map(i => featureMatrix[i]);
+      const y_test = testingIndices.map(i => targetLabels[i]);
 
-      // step 5: train the random forest classifier
-      setTrainingStep(`Training ${params.nTrees} decision trees...`);
-      const options = {
+      // STEP 5: Train Random Forest Classifier
+      setCurrentStep(`Training ${params.nTrees} decision trees...`);
+      const forestOptions = {
         nEstimators: params.nTrees,
         maxDepth: params.maxDepth,
         minNumSamples: params.minSamples,
-        seed: 42, // consistent results
+        seed: 42, // for reproducibility
       };
 
-      const classifier = new RFClassifier(options);
-      classifier.train(trainX, trainY);
+      const randomForest = new RFClassifier(forestOptions);
+      randomForest.train(X_train, y_train);
 
-      // save everything we need for predictions later
-      (classifier as any).options = {
-        ...options,
-        encodingMaps,
-        targetEncoding,
+      // attach preprocessing metadata to model for later predictions
+      (randomForest as any).options = {
+        ...forestOptions,
+        encodingMaps: categoricalEncodings,
+        targetEncoding: targetLabelMapping,
         featureConfig,
-        featureStats,
+        featureStats: numericStats,
       };
 
-      // step 6: test the model on unseen data
-      setTrainingStep("Evaluating model...");
-      const predictions = classifier.predict(testX);
-      const accuracy = predictions.filter((pred: number, idx: number) => pred === testY[idx]).length / testY.length;
+      // STEP 6: Evaluate on held-out test set
+      setCurrentStep("Evaluating model performance...");
+      const testPredictions = randomForest.predict(X_test);
+      const accuracy = testPredictions.filter((pred: number, idx: number) => pred === y_test[idx]).length / y_test.length;
 
-      // build confusion matrix
-      let tp = 0, tn = 0, fp = 0, fn = 0;
-      predictions.forEach((pred: number, idx: number) => {
-        if (pred === 1 && testY[idx] === 1) tp++;
-        else if (pred === 0 && testY[idx] === 0) tn++;
-        else if (pred === 1 && testY[idx] === 0) fp++;
-        else fn++;
+      // confusion matrix calculation
+      let truePositives = 0, trueNegatives = 0, falsePositives = 0, falseNegatives = 0;
+      testPredictions.forEach((predictedLabel: number, idx: number) => {
+        if (predictedLabel === 1 && y_test[idx] === 1) truePositives++;
+        else if (predictedLabel === 0 && y_test[idx] === 0) trueNegatives++;
+        else if (predictedLabel === 1 && y_test[idx] === 0) falsePositives++;
+        else falseNegatives++;
       });
 
-      // calculate metrics
-      const precision = tp > 0 ? tp / (tp + fp) : 0;
-      const recall = tp > 0 ? tp / (tp + fn) : 0;
+      // classification metrics
+      const precision = truePositives > 0 ? truePositives / (truePositives + falsePositives) : 0;
+      const recall = truePositives > 0 ? truePositives / (truePositives + falseNegatives) : 0;
       const f1Score = (precision + recall) > 0 ? (2 * precision * recall) / (precision + recall) : 0;
 
-      // calculate ROC curve points
-      const rocCurve: { fpr: number; tpr: number }[] = [];
-      const thresholds = Array.from({ length: 21 }, (_, i) => i / 20);
+      // ROC curve generation (for binary classification)
+      const rocPoints: { fpr: number; tpr: number }[] = [];
+      const thresholdSteps = Array.from({ length: 21 }, (_, i) => i / 20);
       
-      thresholds.forEach(threshold => {
+      thresholdSteps.forEach(threshold => {
         let tp = 0, fp = 0, tn = 0, fn = 0;
         
-        predictions.forEach((pred: number, idx: number) => {
-          const actual = testY[idx];
-          const predicted = pred;
+        testPredictions.forEach((predictedLabel: number, idx: number) => {
+          const actualLabel = y_test[idx];
           
-          if (predicted === 1 && actual === 1) tp++;
-          else if (predicted === 1 && actual === 0) fp++;
-          else if (predicted === 0 && actual === 0) tn++;
-          else if (predicted === 0 && actual === 1) fn++;
+          if (predictedLabel === 1 && actualLabel === 1) tp++;
+          else if (predictedLabel === 1 && actualLabel === 0) fp++;
+          else if (predictedLabel === 0 && actualLabel === 0) tn++;
+          else if (predictedLabel === 0 && actualLabel === 1) fn++;
         });
         
-        const tpr = tp + fn > 0 ? tp / (tp + fn) : 0;
-        const fpr = fp + tn > 0 ? fp / (fp + tn) : 0;
-        rocCurve.push({ fpr, tpr });
+        const truePositiveRate = tp + fn > 0 ? tp / (tp + fn) : 0;
+        const falsePositiveRate = fp + tn > 0 ? fp / (fp + tn) : 0;
+        rocPoints.push({ fpr: falsePositiveRate, tpr: truePositiveRate });
       });
 
-      // calculate AUC (area under curve)
-      rocCurve.sort((a, b) => a.fpr - b.fpr);
-      let auc = 0;
-      for (let i = 1; i < rocCurve.length; i++) {
-        const width = rocCurve[i].fpr - rocCurve[i - 1].fpr;
-        const height = (rocCurve[i].tpr + rocCurve[i - 1].tpr) / 2;
-        auc += width * height;
+      // AUC calculation using trapezoidal rule
+      rocPoints.sort((a, b) => a.fpr - b.fpr);
+      let areaUnderCurve = 0;
+      for (let i = 1; i < rocPoints.length; i++) {
+        const deltaX = rocPoints[i].fpr - rocPoints[i - 1].fpr;
+        const avgHeight = (rocPoints[i].tpr + rocPoints[i - 1].tpr) / 2;
+        areaUnderCurve += deltaX * avgHeight;
       }
 
-      const modelMetrics = {
+      const evaluationMetrics = {
         accuracy: accuracy * 100,
         precision: precision * 100,
         recall: recall * 100,
         f1Score: f1Score * 100,
-        trainSize: trainX.length,
-        testSize: testX.length,
-        targetEncoding,
-        confusionMatrix: { tp, tn, fp, fn },
-        rocCurve,
-        auc,
+        trainSize: X_train.length,
+        testSize: X_test.length,
+        targetEncoding: targetLabelMapping,
+        confusionMatrix: { 
+          tp: truePositives, 
+          tn: trueNegatives, 
+          fp: falsePositives, 
+          fn: falseNegatives 
+        },
+        rocCurve: rocPoints,
+        auc: areaUnderCurve,
       };
 
-      // step 7: figure out which features matter most using permutation importance
-      setTrainingStep("Calculating feature importance...");
-      const baselineAccuracy = accuracy;
-      const featureImportance = await Promise.all(
-        featureConfig.features.map(async (name, idx) => {
-          // shuffle this feature and see how much worse the model gets
-          const permutedX = testX.map(row => {
-            const newRow = [...row];
-            newRow[idx] = testX[Math.floor(Math.random() * testX.length)][idx];
-            return newRow;
+      // STEP 7: Feature importance via permutation method
+      setCurrentStep("Calculating feature importance...");
+      const baselinePerformance = accuracy;
+      const importanceScores = await Promise.all(
+        featureConfig.features.map(async (featureName, featureIndex) => {
+          // permutation test: shuffle this feature and measure performance drop
+          const permutedFeatures = X_test.map(row => {
+            const modifiedRow = [...row];
+            const randomSampleIndex = Math.floor(Math.random() * X_test.length);
+            modifiedRow[featureIndex] = X_test[randomSampleIndex][featureIndex];
+            return modifiedRow;
           });
-          const permutedPreds = classifier.predict(permutedX);
-          const permutedAccuracy = permutedPreds.filter((pred: number, i: number) => pred === testY[i]).length / testY.length;
-          const importance = Math.max(0, baselineAccuracy - permutedAccuracy);
-          return { feature: name, importance };
+          const permutedPredictions = randomForest.predict(permutedFeatures);
+          const permutedAccuracy = permutedPredictions.filter((pred: number, i: number) => pred === y_test[i]).length / y_test.length;
+          const importanceScore = Math.max(0, baselinePerformance - permutedAccuracy);
+          return { feature: featureName, importance: importanceScore };
         })
       );
 
-      // convert to percentages
-      const totalImportance = featureImportance.reduce((sum, f) => sum + f.importance, 0);
-      const normalizedImportance = featureImportance.map(f => ({
-        ...f,
-        importance: totalImportance > 0 ? (f.importance / totalImportance) * 100 : 0,
+      // normalize to percentages
+      const totalImportance = importanceScores.reduce((sum, item) => sum + item.importance, 0);
+      const normalizedImportance = importanceScores.map(item => ({
+        ...item,
+        importance: totalImportance > 0 ? (item.importance / totalImportance) * 100 : 0,
       }));
 
-      setTrainingStep("Done!");
+      setCurrentStep("Training complete!");
       
-      // show results
-      const accuracyPercent = (accuracy * 100).toFixed(1);
-      toast.success(`Model trained successfully! Accuracy: ${accuracyPercent}%`);
-      onModelTrained(classifier, modelMetrics, normalizedImportance);
+      const accuracyDisplay = (accuracy * 100).toFixed(1);
+      toast.success(`Training complete! Test accuracy: ${accuracyDisplay}%`);
+      onModelTrained(randomForest, evaluationMetrics, normalizedImportance);
     } catch (error) {
-      console.error("Training error:", error);
-      toast.error(error instanceof Error ? error.message : "Training failed");
+      console.error("Training pipeline error:", error);
+      const errorMessage = error instanceof Error ? error.message : "Training failed unexpectedly";
+      toast.error(errorMessage);
     } finally {
       setIsTraining(false);
-      setTrainingStep("");
+      setCurrentStep("");
     }
   };
 
@@ -299,29 +314,29 @@ const ModelTraining = ({ data, featureConfig, onModelTrained, metrics, currentVe
         </div>
 
         <div className="space-y-3">
-          {optimizedParams && (
+          {hyperparameters && (
             <div className="p-2 bg-muted rounded text-xs">
               <div className="grid grid-cols-3 gap-2">
                 <div>
                   <p className="text-muted-foreground">Trees</p>
-                  <p className="font-medium">{optimizedParams.nTrees}</p>
+                  <p className="font-medium">{hyperparameters.nTrees}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Depth</p>
-                  <p className="font-medium">{optimizedParams.maxDepth}</p>
+                  <p className="text-muted-foreground">Max Depth</p>
+                  <p className="font-medium">{hyperparameters.maxDepth}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Min</p>
-                  <p className="font-medium">{optimizedParams.minSamples}</p>
+                  <p className="text-muted-foreground">Min Samples</p>
+                  <p className="font-medium">{hyperparameters.minSamples}</p>
                 </div>
               </div>
             </div>
           )}
 
-          {isTraining && trainingStep && (
+          {isTraining && currentStep && (
             <div className="flex items-center gap-2 p-2 bg-muted rounded text-xs">
               <Loader2 className="w-3 h-3 animate-spin" />
-              <span>{trainingStep}</span>
+              <span>{currentStep}</span>
             </div>
           )}
 
