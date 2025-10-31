@@ -1,4 +1,7 @@
-// shows which features matter most for predictions
+// basicaly this made to show which features matter most for predictions
+//Displays which input features have the most impact on model predictions
+//Uses horizontal chart with color coding
+
 import { Card } from "@/components/user-interface/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 
