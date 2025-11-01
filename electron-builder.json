@@ -1,6 +1,6 @@
 {
-  "appId": "com.student.aitrainer",
-  "productName": "AI Model Trainer",
+  "appId": "com.research.analytics",
+  "productName": "Research Analytics",
   "directories": {
     "output": "release",
     "buildResources": "electron"
