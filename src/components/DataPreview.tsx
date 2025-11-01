@@ -1,4 +1,7 @@
-// data preview with some stats
+/**
+ * Shows a preview of the dataset with basic statistics
+ * Displays first 5 rows in table format
+ */
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/user-interface/table";
 import { Card } from "@/components/user-interface/card";
 import { Badge } from "@/components/user-interface/badge";
@@ -10,26 +13,35 @@ interface DataPreviewProps {
 }
 
 const DataPreview = ({ data, featureConfig }: DataPreviewProps) => {
-  // calc stats for each column
+  // calculate descriptive stats for a given column
   const getStats = (col: string) => {
     const vals = data.map(row => row[col]).filter(v => v !== null && v !== undefined);
     
     if (featureConfig.featureTypes[col] === 'numeric') {
-      // numbers - do mean, median etc
+      // for numeric columns: mean, median, std dev, min, max
       const nums = vals.filter(v => typeof v === 'number') as number[];
       const avg = nums.reduce((a, b) => a + b, 0) / nums.length;
+      
       const sorted = [...nums].sort((a, b) => a - b);
       const med = sorted.length % 2 === 0
         ? (sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2
         : sorted[Math.floor(sorted.length / 2)];
+      
+      // standard deviation calculation
       const variance = nums.reduce((sum, val) => sum + Math.pow(val - avg, 2), 0) / nums.length;
       const stdDev = Math.sqrt(variance);
-      const minVal = Math.min(...nums);
-      const maxVal = Math.max(...nums);
-
-      return { type: 'numeric', mean: avg.toFixed(3), median: med.toFixed(3), std: stdDev.toFixed(3), min: minVal.toFixed(3), max: maxVal.toFixed(3), count: nums.length };
+      
+      return { 
+        type: 'numeric', 
+        mean: avg.toFixed(3), 
+        median: med.toFixed(3), 
+        std: stdDev.toFixed(3), 
+        min: Math.min(...nums).toFixed(3), 
+        max: Math.max(...nums).toFixed(3), 
+        count: nums.length 
+      };
     } else {
-      // text - count unique
+      // for categorical: unique values and mode
       const counts: { [key: string]: number } = {};
       vals.forEach(v => {
         const k = String(v);
@@ -38,7 +50,13 @@ const DataPreview = ({ data, featureConfig }: DataPreviewProps) => {
       const uniq = Object.keys(counts).length;
       const top = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
 
-      return { type: 'categorical', unique: uniq, mostCommon: top?.[0] || 'N/A', mostCommonCount: top?.[1] || 0, count: vals.length };
+      return { 
+        type: 'categorical', 
+        unique: uniq, 
+        mostCommon: top?.[0] || 'N/A', 
+        mostCommonCount: top?.[1] || 0, 
+        count: vals.length 
+      };
     }
   };
 
