@@ -38,7 +38,7 @@ const LandingPage = () => {
               <Brain className="w-7 h-7 text-primary mb-2" />
               
               <div>
-                <h2 className="text-lg font-medium mb-1">AI Model Training</h2>
+                <h2 className="text-lg font-medium mb-1">Model Training</h2>
                 <p className="text-sm text-muted-foreground">
                   Train Random Forest models with version control
                 </p>
