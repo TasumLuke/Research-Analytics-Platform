@@ -1,4 +1,7 @@
-// form for making predictions with the trained model
+/**
+ * Prediction form component
+ * Handles user input and runs predictions through the trained model
+ */
 import { useState } from "react";
 
 import { Button } from "@/components/user-interface/button";
@@ -16,7 +19,7 @@ interface PredictionFormProps {
 }
 
 const PredictionForm = ({ model, featureConfig, onPrediction }: PredictionFormProps) => {
-  // initialize form with default values
+  // set up form state with default values based on feature types
   const [formValues, setFormValues] = useState<{ [key: string]: string }>(() => {
     const initial: { [key: string]: string } = {};
     featureConfig.features.forEach(feature => {
@@ -31,41 +34,55 @@ const PredictionForm = ({ model, featureConfig, onPrediction }: PredictionFormPr
 
   const handlePredict = () => {
     try {
-      // make sure user filled everything in
+      // make sure user filled everything out
       const missingFields = featureConfig.features.filter(f => {
         const val = formValues[f];
         return !val || val === '';
       });
 
-      if (missingFields.length > 0) {
-        toast.error(`Please fill in: ${missingFields.join(', ')}`);
+      if(missingFields.length > 0) {
+        toast.error(`Fill these in first: ${missingFields.join(', ')}`);
         return;
       }
+      
+      // console.log("About to make prediction with:", formValues); // debug
 
-      // grab the encoding maps from when we trained
+      // pull out the mappings we saved when we trained
       const encodingMaps = model.options?.encodingMaps || {};
       const targetEncoding = model.options?.targetEncoding || {};
       const featureStats = model.options?.featureStats || {};
 
-      // convert form values to model input
+      // need to transform the user's input into what model expects
+      // this was a pain to figure out lol
       const features = [featureConfig.features.map(feature => {
-        if (featureConfig.featureTypes[feature] === 'numeric') {
+        const featureType = featureConfig.featureTypes[feature];
+        
+        if(featureType === 'numeric') {
+          // numeric feature - parse and normalize
           const value = parseFloat(formValues[feature]);
-          if (isNaN(value)) {
-            throw new Error(`Invalid numeric value for ${feature}`);
+          if(isNaN(value)) {
+            throw new Error(`Bad number for ${feature}`);
           }
-          // normalize the same way we did in training
-          if (featureStats[feature]) {
-            const { mean, std } = featureStats[feature];
-            return (value - mean) / std;
+          
+          // z-score normalization (same as training)
+          if(featureStats[feature]) {
+            const mean = featureStats[feature].mean;
+            const std = featureStats[feature].std;
+            const normalized = (value - mean) / std;
+            return normalized;
           }
-          return value;
+          return value; // fallback if no stats somehow
+          
         } else {
+          // categorical - need to encode
           const value = formValues[feature];
           const encoded = encodingMaps[feature]?.[value];
-          if (encoded === undefined) {
-            throw new Error(`Unknown category '${value}' for ${feature}`);
+          
+          if(encoded === undefined) {
+            // this happens if user selects a category that wasn't in training data
+            throw new Error(`Haven't seen '${value}' for ${feature} before`);
           }
+          
           return encoded;
         }
       })];
@@ -73,23 +90,44 @@ const PredictionForm = ({ model, featureConfig, onPrediction }: PredictionFormPr
       // run prediction
       const prediction = model.predict(features)[0];
       
-      // figure out confidence by counting votes from trees
+      // calculate confidence - this is based on how many trees agree
+      // learned this approach from: https://stackoverflow.com/questions/34534218
       const allTrees = (model as any).estimators || [];
       let classVotes: { [key: number]: number } = {};
       
-      allTrees.forEach((tree: any) => {
+      // count votes from each tree
+      let treeIndex = 0;
+      while(treeIndex < allTrees.length) {
+        const currentTree = allTrees[treeIndex];
         try {
-          const treePred = tree.predict(features)[0];
-          classVotes[treePred] = (classVotes[treePred] || 0) + 1;
-        } catch {
-          // some trees might fail, just skip them
+          const treePred = currentTree.predict(features)[0];
+          if(classVotes[treePred]) {
+            classVotes[treePred] = classVotes[treePred] + 1;
+          } else {
+            classVotes[treePred] = 1;
+          }
+        } catch(e) {
+          // some trees fail sometimes, just skip them
+          // console.log("Tree failed:", e);
         }
-      });
+        treeIndex++;
+      }
 
-      const totalVotes = Object.values(classVotes).reduce((a, b) => a + b, 0);
-      const confidence = totalVotes > 0 ? (classVotes[prediction] || 0) / totalVotes : 0.5;
+      // calculate confidence as percentage of trees that voted for winner
+      let totalVotes = 0;
+      for(const count of Object.values(classVotes)) {
+        totalVotes = totalVotes + count;
+      }
       
-      // convert prediction back to readable label
+      let confidence;
+      if(totalVotes > 0) {
+        const votesForPrediction = classVotes[prediction] || 0;
+        confidence = votesForPrediction / totalVotes;
+      } else {
+        confidence = 0.5; // default if something went wrong
+      }
+      
+      // decode prediction back to human-readable label
       const targetClasses = Object.entries(targetEncoding);
       const predictedClass = targetClasses.find(([_, val]) => val === prediction)?.[0] || 'Unknown';
 
@@ -103,15 +141,15 @@ const PredictionForm = ({ model, featureConfig, onPrediction }: PredictionFormPr
       };
 
       onPrediction(result);
-      toast.success(`Prediction: ${predictedClass} (${(confidence * 100).toFixed(1)}% confidence)`);
+      toast.success(`Prediction: ${predictedClass} (${(confidence * 100).toFixed(1)}% sure)`);
     } catch (error) {
       console.error("Prediction error:", error);
-      const message = error instanceof Error ? error.message : "Error making prediction";
+      const message = error instanceof Error ? error.message : "Something went wrong";
       toast.error(message);
     }
   };
 
-  // get dropdown options for categorical features
+  // pull categorical options from the encoding map
   const getCategoricalOptions = (feature: string): string[] => {
     const encodingMap = model.options?.encodingMaps?.[feature];
     return encodingMap ? Object.keys(encodingMap) : [];
