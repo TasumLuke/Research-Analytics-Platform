@@ -129,6 +129,40 @@ These are concrete tasks that anyone can pick up and implement:
 
 ---
 
+## Packaging the Application with Electron
+This software can be bundled into a desktop application using Electron and electron-builder. This creates a standalone installer (.exe, .dmg, or .AppImage) for Windows, macOS, and Linux.
+
+### Prerequisites
+Before packaging:
+- Ensure all dependencies are installed:
+``` bash
+npm install
+```
+- Ensure the build is ready:
+``` bash
+npm run build
+```
+### Build and Package
+To create a Windows installer using NSIS:
+``` bash
+npx electron-builder --win nsis
+```
+To create a macOS installer:
+``` bash
+npx electron-builder --mac
+```
+To create a Linux installer:
+``` bash
+npx electron-builder --linux AppImage
+```
+
+Electron builder will generate a release/ folder containing the .exe installer (for Windows) and an unpacked version for testing.
+
+### Note
+The release/ folder should not be committed. It is for distribution only.
+
+---
+
 ## Troubleshooting & tips 
 - If `npm run dev` shows port conflict, check which process holds the port and kill it, or change the port in `vite.config.js`.  
 - Large CSVs in-browser cause memory issues; add server-side ingestion for >50MB datasets.  
