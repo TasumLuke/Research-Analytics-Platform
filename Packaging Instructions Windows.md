@@ -2,7 +2,7 @@
 
 **Author:** Luke Rimmo Lego, Denver Baptiste
 
-This README describes, step-by-step, how to replicate my workflow to build the Windows executable (installer + portable EXE) for the *Research Analytics Platform — AI Model Trainer* from source. It includes exact commands run on my Windows 10 machine, common fixes I encountered, and quick troubleshooting notes so you can reproduce the build reliably.
+This README describes, step-by-step, how to replicate my workflow to build the Windows executable (installer + portable EXE) for the *Research Analytics Platform, AI Model Trainer* from source. It includes exact commands run on my Windows 10 machine, common fixes I encountered, and quick troubleshooting notes so you can reproduce the build reliably.
 
 ---
 
