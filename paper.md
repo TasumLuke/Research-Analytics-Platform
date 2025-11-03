@@ -50,7 +50,7 @@ Our software addresses analysis and computational limitations by providing both 
 
 The ASMLP-BR platform's modular interface organizes functionality into distinct tabs for data upload, model training, prediction, result visualization, and statistical analysis (Figure 1). This workflow-oriented design guides users through the complete analysis pipeline while maintaining access to all features.
 
-![Interface dashboard showing the main analysis modules.\label{fig:interface}](interface.png)
+![Interface dashboard showing the main analysis modules.\label{fig:interface}](interface1.png)
 
 ## Architecture and Core Technologies
 
