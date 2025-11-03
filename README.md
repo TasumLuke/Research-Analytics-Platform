@@ -73,7 +73,7 @@ git commit -m "feat: short description of your change"
 git push origin feat/your-short-description
 
 # Then open a Pull Request from your fork to the original repo
-# Keep PRs small and focused — makes review easier
+# Keep PRs small and focused
 ```
 
 **Windows users:** Git Bash is a friendly shell for these commands. Set `core.autocrlf` if you see line ending issues:
