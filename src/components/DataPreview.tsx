@@ -13,22 +13,44 @@ interface DataPreviewProps {
 }
 
 const DataPreview = ({ data, featureConfig }: DataPreviewProps) => {
-  // calculate descriptive stats for a given column
+  // stats calculator for each column
   const getStats = (col: string) => {
+    // get all values, skip nulls
     const vals = data.map(row => row[col]).filter(v => v !== null && v !== undefined);
     
-    if (featureConfig.featureTypes[col] === 'numeric') {
-      // for numeric columns: mean, median, std dev, min, max
+    const columnType = featureConfig.featureTypes[col];
+    
+    if(columnType === 'numeric') {
+      // numeric column - calculate mean, median, std, etc
       const nums = vals.filter(v => typeof v === 'number') as number[];
-      const avg = nums.reduce((a, b) => a + b, 0) / nums.length;
       
+      // mean calculation
+      let sum = 0;
+      for(let i = 0; i < nums.length; i++) {
+        sum += nums[i];
+      }
+      const avg = sum / nums.length;
+      
+      // median - need to sort first
       const sorted = [...nums].sort((a, b) => a - b);
-      const med = sorted.length % 2 === 0
-        ? (sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2
-        : sorted[Math.floor(sorted.length / 2)];
+      let med;
+      if(sorted.length % 2 === 0) {
+        // even number of elements - average the middle two
+        const mid1 = sorted[sorted.length / 2 - 1];
+        const mid2 = sorted[sorted.length / 2];
+        med = (mid1 + mid2) / 2;
+      } else {
+        // odd - just take middle element
+        med = sorted[Math.floor(sorted.length / 2)];
+      }
       
-      // standard deviation calculation
-      const variance = nums.reduce((sum, val) => sum + Math.pow(val - avg, 2), 0) / nums.length;
+      // std dev (took forever to get this right)
+      let varianceSum = 0;
+      for(let i = 0; i < nums.length; i++) {
+        const diff = nums[i] - avg;
+        varianceSum = varianceSum + (diff * diff);
+      }
+      const variance = varianceSum / nums.length;
       const stdDev = Math.sqrt(variance);
       
       return { 
