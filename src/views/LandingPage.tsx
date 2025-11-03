@@ -1,5 +1,6 @@
 // home page where you pick what to do
-// using shadcn ui components - https://www.shadcn.io/template
+// using shadcn ui components: https://www.shadcn.io/template
+// just two cards... needed 4 dis
 import { useNavigate } from "react-router-dom";
 import { Brain, BarChart3 } from "lucide-react";
 import { Card } from "@/components/user-interface/card";
@@ -12,7 +13,7 @@ const LandingPage = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <main className="container mx-auto px-6 py-12 flex-1">
-        {/* header stuff */}
+        {/* logo and title section */}
         <div className="text-center mb-12">
           <img 
             src={logo}
@@ -27,12 +28,12 @@ const LandingPage = () => {
           </p>
         </div>
 
-        {/* two main options */}
+        {/* main feature cards */}
         <div className="grid md:grid-cols-2 gap-5 max-w-3xl mx-auto">
-          {/* training models */}
+          {/* model training card */}
           <Card 
             className="p-5 cursor-pointer hover:border-primary"
-            onClick={() => nav("/train-model")}
+            onClick={() => nav('/train-model')}
           >
             <div className="space-y-3">
               <Brain className="w-7 h-7 text-primary mb-2" />
@@ -50,10 +51,10 @@ const LandingPage = () => {
             </div>
           </Card>
 
-          {/* analyzing data */}
+          {/* stats card */}
           <Card 
             className="p-5 cursor-pointer hover:border-primary"
-            onClick={() => nav("/analyze-data")}
+            onClick={() => nav('/analyze-data')}
           >
             <div className="space-y-3">
               <BarChart3 className="w-7 h-7 text-primary mb-2" />
@@ -77,7 +78,7 @@ const LandingPage = () => {
       <footer className="border-t border-border py-6 mt-12">
         <div className="container mx-auto px-6 text-center space-y-2">
           <p className="text-sm text-muted-foreground">
-            Made by Luke Rimmo Lego & Dr. Denver Baptiste
+            Made by Luke Rimmo Lego, Samantha Gauthier & Dr. Denver Baptiste
           </p>
           <p className="text-xs text-muted-foreground">
             UI from <a href="https://www.shadcn.io/template" target="_blank" rel="noopener noreferrer" className="underline">shadcn/ui</a>
