@@ -1,4 +1,7 @@
-// displays prediction results and model metrics
+/**
+ * Results visualization with charts and export
+ * Shows prediction history, metrics, and confusion matrix
+ */
 import { Card } from "@/components/user-interface/card";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, ScatterChart, Scatter } from "recharts";
 import { Download } from "lucide-react";
@@ -10,52 +13,80 @@ interface ResultsVisualizationProps {
   metrics: any;
 }
 
+// colors for the charts - using semantic tokens from design system
 const COLORS = ["hsl(var(--primary))", "hsl(var(--destructive))", "hsl(var(--success))", "hsl(var(--warning))"];
 
 const ResultsVisualization = ({ predictions, metrics }: ResultsVisualizationProps) => {
-  if (predictions.length === 0) return null;
+  // nothing to show if no predictions yet
+  if(predictions.length === 0) return null;
+  
+  // console.log("Rendering results for", predictions.length, "predictions");
 
-  // get all the different prediction classes
+  // get all unique classes (should refactor this to use reduce maybe?)
   const allClasses = [...new Set(predictions.map(p => p.prediction))];
   
-  // format data for charts
-  const predictionHistory = predictions.map((pred, idx) => ({
-    id: idx + 1,
-    predictionValue: pred.predictionValue,
-    confidence: pred.confidence * 100,
-    class: pred.prediction,
-  }));
+  // transform prediction data for charts
+  // TODO: clean this up later
+  const predictionHistory = predictions.map((pred, idx) => {
+    return {
+      id: idx + 1,
+      predictionValue: pred.predictionValue,
+      confidence: pred.confidence * 100,
+      class: pred.prediction,
+    };
+  });
 
-  const classDistribution = allClasses.map(cls => ({
-    name: String(cls),
-    value: predictions.filter((p) => p.prediction === cls).length,
-  }));
-
-  // export to csv file
-  const handleExport = () => {
-    if (predictions.length === 0) return;
+  // count how many of each class - doing it manually for clarity
+  const classDistribution = allClasses.map(cls => {
+    let countForThisClass = 0;
+    for(let i = 0; i < predictions.length; i++) {
+      if(predictions[i].prediction === cls) {
+        countForThisClass++;
+      }
+    }
     
+    return {
+      name: String(cls),
+      value: countForThisClass,
+    };
+  });
+
+  // export to CSV file
+  // copied from https://stackoverflow.com/questions/14964035/how-to-export-javascript-array-info-to-csv-on-client-side
+  const handleExport = () => {
+    if(predictions.length === 0) return;
+    
+    // get column names from first prediction
     const inputKeys = Object.keys(predictions[0].inputs || {});
     const headers = ["Timestamp", ...inputKeys, "Prediction", "Confidence %"];
     
-    const csv = [
-      headers,
-      ...predictions.map((p) => [
-        p.timestamp,
-        ...inputKeys.map(key => p.inputs[key]),
-        p.prediction,
-        (p.confidence * 100).toFixed(1),
-      ]),
-    ]
-      .map((row) => row.join(","))
-      .join("\n");
+    // build CSV string
+    let csvContent = headers.join(",") + "\n";
+    
+    for(let i = 0; i < predictions.length; i++) {
+      const p = predictions[i];
+      let row = [p.timestamp];
+      
+      // add input values
+      for(let j = 0; j < inputKeys.length; j++) {
+        row.push(p.inputs[inputKeys[j]]);
+      }
+      
+      // add prediction and confidence
+      row.push(p.prediction);
+      row.push((p.confidence * 100).toFixed(1));
+      
+      csvContent = csvContent + row.join(",") + "\n";
+    }
 
-    const blob = new Blob([csv], { type: "text/csv" });
+    // trigger download
+    const blob = new Blob([csvContent], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
     a.download = "predictions.csv";
     a.click();
+    
     toast.success("Predictions exported");
   };
 
