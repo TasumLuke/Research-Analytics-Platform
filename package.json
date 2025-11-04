@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.1",
   "description": "AI Model Trainer",
-  "author": "Luke Rimmo Lego, Samantha Gauthier & Dr. Denver Baptiste",
+  "author": "Luke Rimmo Lego, Samantha Gauthier, & Dr. Denver Baptiste",
   "main": "electron/main.cjs",
   "type": "module",
   "scripts": {
