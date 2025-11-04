@@ -1,3 +1,4 @@
+// Purpose: loading / saving models
 import { Download, Upload } from "lucide-react";
 import { Button } from "@/components/user-interface/button";
 import { Card } from "@/components/user-interface/card";
@@ -12,6 +13,17 @@ interface ModelSaveLoadProps {
   onModelLoaded: (model: any, metrics: any, importance: any[], config: any) => void;
 }
 
+/**
+ * Saves / loads RF model
+ * @component
+ * @param {Object} props Component props
+ * @param {any} props.model Trained model
+ * @param {any} props.metrics Model's evaluation metrics
+ * @param {Array} props.featureImportance Feature importance array
+ * @param {any} props.featureConfig Object with features and target
+ * @param {(model: any, metrics: any, importance: any[], config: any) => void} props.onModelLoaded Successful Model Loading
+ * @returns {JSX.Element} Rendered buttons for saving / loading model
+ */
 const ModelSaveLoad = ({ 
   model, 
   metrics, 

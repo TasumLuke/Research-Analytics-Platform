@@ -16,6 +16,13 @@ interface FileUploadProps {
   onDataLoaded: (data: ResearchData[], config: FeatureConfig) => void;
 }
 
+/**
+ * CSV file upload, parsing, and configuration
+ * @component
+ * @param {Object} props Component props
+ * @param {(data: ResearchData[], config: FeatureConfig) => void} props.onDataLoaded Successful CSV loading and parsing
+ * @returns {JSX.Element} Rendered CSV upload
+ */
 const FileUpload = ({ onDataLoaded }: FileUploadProps) => {
   // drag & drop UI state
    const [dragging, setDragging] = useState(false);

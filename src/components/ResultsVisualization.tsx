@@ -1,4 +1,5 @@
 /**
+ * Purpose:
  * Results visualization with charts and export
  * Shows prediction history, metrics, and confusion matrix
  */
@@ -16,6 +17,11 @@ interface ResultsVisualizationProps {
 // colors for the charts - using semantic tokens from design system
 const COLORS = ["hsl(var(--primary))", "hsl(var(--destructive))", "hsl(var(--success))", "hsl(var(--warning))"];
 
+/**
+ * Displays predication history, metrics, confusion matrix, other visualization charts
+ * @param {any[]} predictions Array of prediction objects
+ * @param {any} metrics Evaluation metrics
+ */
 const ResultsVisualization = ({ predictions, metrics }: ResultsVisualizationProps) => {
   // nothing to show if no predictions yet
   if(predictions.length === 0) return null;

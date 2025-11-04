@@ -1,24 +1,43 @@
-// upload csv for data analysis
+// Purpose: upload csv for data analysis
 import { useState } from "react";
 import { Card } from "@/components/user-interface/card";
 import { Button } from "@/components/user-interface/button";
 import Papa from "papaparse";
 import { AnalysisData } from "@/views/types";
 
+/**
+ * For DataUploadAnalysis component.
+ * @property {(data: AnalysisData[], columns: string[], columnTypes: { [key: string]: 'numeric' | 'categorical' }) => void} onDataLoaded
+ * CSV data is successfully loaded and parsed.
+ */
 interface DataUploadAnalysisProps {
   onDataLoaded: (data: AnalysisData[], columns: string[], columnTypes: { [key: string]: 'numeric' | 'categorical' }) => void;
 }
 
+/**
+ * Allows users to upload CSV file: Parses CSV files, detects numeric vs categorical, calls onDataLoaded when successful
+ * @component
+ * @param {DataUploadAnalysisProps} props Component props
+ * @returns {JSX.Element} Rendered file upload UI
+ */
 const DataUploadAnalysis = ({ onDataLoaded }: DataUploadAnalysisProps) => {
   const [fileName, setFileName] = useState<string>("");
   const [isValid, setIsValid] = useState<boolean>(false);
 
-  // figure out if column is numbers or categories
+  /**
+   * Determines if column is numerical or categorical
+   * @param {any[]} values Array of column values
+   * @returns {'numeric' | 'categorical'} Column type
+   */
   const detectColumnType = (values: any[]): 'numeric' | 'categorical' => {
     const numericCount = values.filter(v => !isNaN(parseFloat(v)) && isFinite(v)).length;
     return numericCount / values.length > 0.8 ? 'numeric' : 'categorical';
   };
 
+  /**
+   * CSV file selection: parses file and determines column type. Calls onDataLoaded when successful
+   * @param {React.ChangeEvent<HTMLInputElement>} event File input event
+   */
   const handleFile = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;

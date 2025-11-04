@@ -1,4 +1,5 @@
 /**
+ * Purpose:
  * Shows a preview of the dataset with basic statistics
  * Displays first 5 rows in table format
  */
@@ -12,8 +13,20 @@ interface DataPreviewProps {
   featureConfig: FeatureConfig;
 }
 
+/**
+ * Displays preview of dataset with basic stats
+ * @component
+ * @param {Object} props Component props
+ * @param {ResearchData[]} props.data Array of data rows
+ * @param {FeatureConfig} props.featureConfig Feature configuration
+ * @returns {JSX.Element} Rendered table preview with column stats
+ */
 const DataPreview = ({ data, featureConfig }: DataPreviewProps) => {
-  // stats calculator for each column
+  /**
+   * Given column, calculates stats (depends on column types)
+   * @param {string} col Column name
+   * @returns {object} Stats object
+   */
   const getStats = (col: string) => {
     // get all values, skip nulls
     const vals = data.map(row => row[col]).filter(v => v !== null && v !== undefined);

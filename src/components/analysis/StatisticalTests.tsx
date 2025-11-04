@@ -1,4 +1,4 @@
-// run statistical tests on data
+// Purpose: run statistical tests on data
 import { useState } from "react";
 import { Card } from "@/components/user-interface/card";
 import { Button } from "@/components/user-interface/button";
@@ -15,12 +15,24 @@ import {
 import { Badge } from "@/components/user-interface/badge";
 import { ScatterChart, Scatter, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, ReferenceLine } from "recharts";
 
+/**
+ * For StatisticalTests component
+ * @property {AnalysisData[]} data Array of data rows
+ * @property {string[]} columns Names of columns in dataset
+ * @property {{ [key: string]: 'numeric' | 'categorical' }} columnTypes Column names and types
+ */
 interface StatisticalTestsProps {
   data: AnalysisData[];
   columns: string[];
   columnTypes: { [key: string]: 'numeric' | 'categorical' };
 }
 
+/**
+ * Allows user to perform statistical tests (one-sample t-test, one-way ANOVA, pearson correlation).
+ * @component
+ * @param {StatisticalTestsProps} props Component props
+ * @returns {JSX.Element} UI for selecting tests, vars, and showing results
+ */
 const StatisticalTests = ({ data, columns, columnTypes }: StatisticalTestsProps) => {
   const [testType, setTestType] = useState<string>("ttest");
   const [variable1, setVariable1] = useState<string>("");
@@ -32,7 +44,11 @@ const StatisticalTests = ({ data, columns, columnTypes }: StatisticalTestsProps)
   const numericColumns = columns.filter(col => columnTypes[col] === 'numeric');
   const categoricalColumns = columns.filter(col => columnTypes[col] === 'categorical');
 
-  // check normality using shapiro-wilk approximation
+  /**
+   * Checks normality using shapiro-wilk approximation
+   * @param {number[]} values Values to test
+   * @returns {object} { isNormal, skewness, kurtosis, qqData }
+   */
   const checkNormality = (values: number[]) => {
     const n = values.length;
     const sorted = [...values].sort((a, b) => a - b);
@@ -56,7 +72,11 @@ const StatisticalTests = ({ data, columns, columnTypes }: StatisticalTestsProps)
     return { isNormal, skewness, kurtosis, qqData };
   };
 
-  // inverse normal cdf approximation
+  /**
+   * Inverse normal CDF approximation
+   * @param {number} p Probability
+   * @returns {number} z-score
+   */
   const inverseNormalCDF = (p: number) => {
     const a = [2.50662823884, -18.61500062529, 41.39119773534, -25.44106049637];
     const b = [-8.47351093090, 23.08336743743, -21.06224101826, 3.13082909833];
@@ -75,7 +95,11 @@ const StatisticalTests = ({ data, columns, columnTypes }: StatisticalTestsProps)
     }
   };
 
-  // check homoscedasticity (equal variances)
+  /**
+   * Checks homoscedasticity (equal variances)
+   * @param {{ group: string; values: number[] }[]} groups Array of groups
+   * @returns {object} { isHomoscedastic, variances, ratio }
+   */
   const checkHomoscedasticity = (groups: { group: string; values: number[] }[]) => {
     // calculate variance for each group
     const variances = groups.map(g => {
@@ -95,7 +119,12 @@ const StatisticalTests = ({ data, columns, columnTypes }: StatisticalTestsProps)
     return { isHomoscedastic, variances, ratio };
   };
 
-  // generate residual plot data
+  /**
+   * Generates residual plot data
+   * @param {number[]} predicted Predicted values from model/group means
+   * @param {number[]} observed Observed values
+   * @returns {{predicted: number, residual: number}[]} Array of residuals
+   */
   const generateResidualPlot = (predicted: number[], observed: number[]) => {
     return predicted.map((pred, i) => ({
       predicted: pred,

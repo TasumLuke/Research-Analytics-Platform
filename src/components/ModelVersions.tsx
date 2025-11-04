@@ -1,4 +1,4 @@
-// keeps track of different model versions
+// Purpose: keeps track of different model versions
 import { Card } from "@/components/user-interface/card";
 import { Button } from "@/components/user-interface/button";
 import { Badge } from "@/components/user-interface/badge";
@@ -9,7 +9,12 @@ interface ModelVersionsProps {
   onLoadVersion: (version: ModelVersion) => void;
   currentVersion: string;
 }
-
+/**
+ * Displays list of model versions and allows user to load model version
+ * @param {ModelVersion[]} versions Array of model versions
+ * @param {(version: ModelVersion) => void} onLoadVersion Successful version loading
+ * @param {string} currentVersion String version of current active model
+ */
 const ModelVersions = ({ versions, onLoadVersion, currentVersion }: ModelVersionsProps) => {
   return (
     <div className="space-y-4">

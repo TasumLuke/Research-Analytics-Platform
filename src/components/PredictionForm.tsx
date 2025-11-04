@@ -1,4 +1,5 @@
 /**
+ * Purpose:
  * Prediction form component
  * Handles user input and runs predictions through the trained model
  */
@@ -18,6 +19,12 @@ interface PredictionFormProps {
   onPrediction: (prediction: any) => void;
 }
 
+/**
+ * Handles user input for predictions
+ * @param {any} model Trained model
+ * @param {FeatureConfig} featureConfig Configuration of features and target vars
+ * @param {(prediction: any) => void} onPrediction For prediction results
+ */
 const PredictionForm = ({ model, featureConfig, onPrediction }: PredictionFormProps) => {
   // set up form state with default values based on feature types
   const [formValues, setFormValues] = useState<{ [key: string]: string }>(() => {

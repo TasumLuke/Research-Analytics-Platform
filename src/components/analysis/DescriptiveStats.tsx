@@ -1,4 +1,4 @@
-// calculate descriptive statistics
+// Purpose: to calculate descriptive statistics
 import { Card } from "@/components/user-interface/card";
 import { BarChart3 } from "lucide-react";
 import { AnalysisData } from "@/views/types";
@@ -11,14 +11,30 @@ import {
   TableRow,
 } from "@/components/user-interface/table";
 
+/**
+ * For DescriptiveStats component
+ * @property {AnalysisData[]} data Array of data rows
+ * @property {string[]} columns Names of columns in dataset
+ * @property {{ [key: string]: 'numeric' | 'categorical' }} columnTypes Column names and types
+ */
 interface DescriptiveStatsProps {
   data: AnalysisData[];
   columns: string[];
   columnTypes: { [key: string]: 'numeric' | 'categorical' };
 }
 
+/**
+ * Calculates and displays statistics for each column
+ * @component
+ * @param {DescriptiveStatsProps} props Component props
+ * @returns {JSX.Element} Table of statistics
+ */
 const DescriptiveStats = ({ data, columns, columnTypes }: DescriptiveStatsProps) => {
-  // calculate stats for each column
+  /**
+   * Calculates stats for single column
+   * @param {string} column Column name to calculate stats
+   * @returns {object} Stats object (changes depending on column type)
+   */
   const calculateStats = (column: string) => {
     const values = data.map(row => row[column]);
     

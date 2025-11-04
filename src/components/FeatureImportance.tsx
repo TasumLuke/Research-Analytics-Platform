@@ -1,6 +1,6 @@
-// basicaly this made to show which features matter most for predictions
-//Displays which input features have the most impact on model predictions
-//Uses horizontal chart with color coding
+// Purpose: to show which features matter most for predictions
+// Displays which input features have the most impact on model predictions
+// Uses horizontal chart with color coding
 
 import { Card } from "@/components/user-interface/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
@@ -16,6 +16,13 @@ const COLORS = [
   "hsl(var(--info))",
 ];
 
+/**
+ * Shows importance of features for predictions
+ * @component
+ * @param {Object} props Component props
+ * @param {Array<{ feature: string; importance: number }>} props.data Array of feature importance objects
+ * @returns {JSX.Element} Rendered bar chart of feature importance
+ */
 const FeatureImportance = ({ data }: FeatureImportanceProps) => {
   return (
     <Card className="p-4">

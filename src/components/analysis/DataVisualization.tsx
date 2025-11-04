@@ -1,4 +1,4 @@
-// make charts from data
+// Purpose: make charts from data
 import { useState, useRef } from "react";
 import { Card } from "@/components/user-interface/card";
 import { Label } from "@/components/user-interface/label";
@@ -31,6 +31,12 @@ import {
   Cell,
 } from "recharts";
 
+/**
+ * For DataVisualization component
+ * @property {AnalysisData[]} data Array of data rows
+ * @property {string[]} columns Names of all columns in dataset
+ * @property {{ [key: string]: 'numeric' | 'categorical' }} columnTypes Column names and types
+ */
 interface DataVisualizationProps {
   data: AnalysisData[];
   columns: string[];
@@ -39,6 +45,12 @@ interface DataVisualizationProps {
 
 const COLORS = ['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--success))', 'hsl(var(--warning))', 'hsl(var(--destructive))', 'hsl(var(--accent))'];
 
+/**
+ * Renders interaction charts. Chart type can be selected by user and downloaded.
+ * @component
+ * @param {DataVisualizationProps} props Component props
+ * @return {JSX.Element} Rendered chart UI
+ */
 const DataVisualization = ({ data, columns, columnTypes }: DataVisualizationProps) => {
   const [chartType, setChartType] = useState<string>("bar");
   const [xAxis, setXAxis] = useState<string>("");
@@ -94,7 +106,10 @@ const DataVisualization = ({ data, columns, columnTypes }: DataVisualizationProp
   const numericColumns = columns.filter(col => columnTypes[col] === 'numeric');
   const categoricalColumns = columns.filter(col => columnTypes[col] === 'categorical');
 
-  // format data depending on chart type
+  /**
+   * Prepares chart data to selected chart and selected axis
+   * @returns {any[]} Chart data
+   */
   const prepareChartData = () => {
     if (!xAxis) return [];
 

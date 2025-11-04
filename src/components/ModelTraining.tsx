@@ -1,7 +1,15 @@
 /**
- * Random Forest Model Training Component
+ * Random Forest Model Training Component:
+ * 
  * Handles data preprocessing, training, evaluation, and feature importance calculation
- * Auto-optimizes hyperparameters based on dataset size
+ * Auto-optimizes hyperparameters based on dataset size.
+ * 
+ * @component
+ * @param {ResearchData[]} data Dataset for training
+ * @param {FeatureConfig} featureConfig Configuration for deatures and target
+ * @param {(model: any, metrics: any, importance: any[]) => void} onModelTrained For when training is completed
+ * @param {any} metrics Evaluation metrics
+ * @param {string} currentVersion Current Model Version
  */
 import { useState } from "react";
 import { Brain, Play, CheckCircle, Loader2 } from "lucide-react";
@@ -30,6 +38,8 @@ const ModelTraining = ({ data, featureConfig, onModelTrained, metrics, currentVe
   /**
    * Auto-optimize Random Forest hyperparameters based on dataset characteristics
    * Considers dataset size and number of features to balance performance vs accuracy
+   * 
+   * @returns {{ nTrees: number, maxDepth: number, minSamples: number }} Optimized hyperparams
    */
   const optimizeHyperparameters = () => {
     const datasetSize = data.length;
@@ -68,7 +78,10 @@ const ModelTraining = ({ data, featureConfig, onModelTrained, metrics, currentVe
   };
 
   /**
-   * Main training pipeline - preprocesses data, trains Random Forest, evaluates performance
+   * Main training pipeline - preprocesses/encodes data, encodes/normalizes features, prep target feature, 
+   * splits dataset into training/testing set, trains Random Forest, evaluates performance, cpmputes feature importance
+   * @async
+   * @returns {Promise<void>} Exits when training and evaluations are completed
    */
   const trainModel = async () => {
     // minimum dataset size check

@@ -9,6 +9,11 @@ import {
   MessageContainer 
 } from "@/bits/message-parts";
 
+/**
+ * Renders all active toast notifs for the user. Retreives current message.
+ * @component
+ * @returns {JSX.Element}
+ */
 export function PopupMessages() {
   const { messages } = useMessages();
 
