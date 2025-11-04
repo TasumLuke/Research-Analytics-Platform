@@ -14,32 +14,6 @@
     "preview": "vite preview",
     "dist": "electron-builder"
   },
-  "build": {
-    "appId": "quackid",
-    "productName": "Quackalyst",
-    "files": [
-      "dist/**/*",
-      "src/**/*",
-      "electron/**/*",
-      "package.json"
-    ],
-    "directories": {
-      "buildResources": "src/assets"
-    },
-    "publish": {
-      "provider": "github",
-      "releaseType": "release"
-    },
-    "win": {
-      "target": "nsis"
-    },
-    "mac": {
-      "target": "dmg"
-    },
-    "linux": {
-      "target": "AppImage"
-    }
-  },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "^1.2.11",
