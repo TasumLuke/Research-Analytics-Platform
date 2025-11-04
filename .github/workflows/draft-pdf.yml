@@ -13,12 +13,13 @@ jobs:
     runs-on: ubuntu-latest
     name: Paper Draft
     steps:
-      # Step 1: Checkout repository with GITHUB_TOKEN
+      # Step 1: Checkout repository on a branch (avoid detached HEAD)
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          persist-credentials: true
           token: ${{ secrets.GITHUB_TOKEN }}
+          ref: main   # <-- replace with your default branch if not 'main'
+          persist-credentials: true
 
       # Step 2: Build draft PDF
       - name: Build draft PDF
@@ -43,7 +44,7 @@ jobs:
           git add paper.pdf
           if ! git diff --cached --quiet; then
             git commit -m "(auto) update paper PDF"
-            git push
+            # Push explicitly to main branch to avoid detached HEAD issues
+            git push origin HEAD:main
           else
             echo "No changes in paper.pdf; skipping commit."
-          fi
