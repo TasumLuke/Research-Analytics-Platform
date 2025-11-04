@@ -9,9 +9,18 @@ permissions:
   contents: write
 
 jobs:
-  build-and-release:
-    runs-on: ubuntu-latest
-    
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            platform: windows
+          - os: macos-latest  
+            platform: mac
+          - os: ubuntu-latest
+            platform: linux
+    runs-on: ${{ matrix.os }}
+
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
@@ -27,12 +36,7 @@ jobs:
       - name: Build frontend
         run: npm run build
 
-      - name: Install Windows build dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y wine
-
-      - name: Build for all platforms
-        run: npx electron-builder --win --mac --linux --publish=always
+      - name: Build and publish Electron app
+        run: npx electron-builder --publish=always
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
