@@ -1,4 +1,5 @@
 name: Draft PDF
+
 permissions:
   contents: write
 
@@ -34,14 +35,15 @@ jobs:
           name: paper
           path: paper.pdf
 
-      # Step 4: Commit PDF back only if changed
+      # Step 4: Commit PDF back only if changed (FIXED - no set command)
       - name: Commit PDF if changed
         run: |
-          set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add paper.pdf
-            git push
-          else
+          if git diff --staged --quiet; then
             echo "No changes in paper.pdf; skipping commit."
+          else
+            git commit -m "(auto) update paper PDF"
+            git push
           fi
