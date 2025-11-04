@@ -24,7 +24,7 @@ const LandingPage = () => {
             Research Analytics
           </h1>
           <p className="text-base text-muted-foreground">
-            Pick what you wanna do
+            Choose an option
           </p>
         </div>
 
