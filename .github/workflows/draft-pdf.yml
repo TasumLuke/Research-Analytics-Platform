@@ -35,8 +35,9 @@ jobs:
           name: paper
           path: paper.pdf
 
-      # Step 4: Commit PDF back only if changed (FIXED - no set command)
+      # Step 4: Commit PDF back only if changed (run only on branch refs to avoid detached HEAD push failure)
       - name: Commit PDF if changed
+        if: startsWith(github.ref, 'refs/heads/')
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
