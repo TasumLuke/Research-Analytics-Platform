@@ -25,7 +25,7 @@ This repository contains a lightweight frontend (React + TypeScript) for loading
 - Node.js (LTS recommended; Node 18+ is a safe baseline).  
 - npm (bundled with Node) or yarn.  
 - Git.  
--  Python 3.9+ if you want to use the optional analysis/backend scripts in `python/`. See **Python support** below.
+-  Python 3.9+ 
 
 ### Clone & run locally (minimum steps)
 ```bash
