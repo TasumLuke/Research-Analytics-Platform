@@ -84,7 +84,6 @@ const ModelTraining = ({ data, featureConfig, onModelTrained, metrics, currentVe
     setHyperparameters(params);
 
     try {
-      const filteredFeatures = featureConfig.features.filter(f => f != featureConfig.target); // removing target feature from training
       // STEP 1: Data preprocessing and encoding
       setCurrentStep("Preparing data...");
       
@@ -92,7 +91,7 @@ const ModelTraining = ({ data, featureConfig, onModelTrained, metrics, currentVe
       const categoricalEncodings: { [key: string]: { [key: string]: number } } = {};
       const numericStats: { [key: string]: { mean: number; std: number } } = {};
       
-      filteredFeatures.forEach(featureName => {
+      featureConfig.features.forEach(featureName => {
         if (featureConfig.featureTypes[featureName] === 'categorical') {
           // label encoding: map each unique category to an integer
           const uniqueCategories = [...new Set(data.map(row => String(row[featureName] || 'unknown')))];
@@ -114,7 +113,7 @@ const ModelTraining = ({ data, featureConfig, onModelTrained, metrics, currentVe
       // STEP 2: Feature encoding and normalization
       setCurrentStep("Encoding and normalizing features...");
       const featureMatrix = data.map(row => 
-        filteredFeatures.map(featureName => {
+        featureConfig.features.map(featureName => {
           const rawValue = row[featureName];
           if (featureConfig.featureTypes[featureName] === 'categorical') {
             const stringValue = String(rawValue || 'unknown');
@@ -265,7 +264,7 @@ const ModelTraining = ({ data, featureConfig, onModelTrained, metrics, currentVe
       setCurrentStep("Calculating feature importance...");
       const baselinePerformance = accuracy;
       const importanceScores = await Promise.all(
-        filteredFeatures.map(async (featureName, featureIndex) => {
+        featureConfig.features.map(async (featureName, featureIndex) => {
           // permutation test: shuffle this feature and measure performance drop
           const permutedFeatures = X_test.map(row => {
             const modifiedRow = [...row];
