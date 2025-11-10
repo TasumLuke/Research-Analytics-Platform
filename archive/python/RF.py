@@ -1,6 +1,6 @@
 """
 RF.py
-------------
+------------ 
 Description:
 Random Forest web application via Streamlit.
 - Upload, analyze, and visualize datasets (csv)
@@ -372,4 +372,5 @@ st.download_button(
     data=model_buffer,
     file_name=model_filename if model_filename.endswith(".joblib") else f"{model_filename}.joblib",
     mime="application/octet-stream"
+
 )
