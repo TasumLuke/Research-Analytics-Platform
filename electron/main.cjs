@@ -1,6 +1,3 @@
-/**
- * Electron entry point - bootstraps the desktop app window
- */
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
 
