@@ -1,9 +1,8 @@
 /**
  * App configuration and routing setup
  * Using HashRouter because this is to be packaged  as an Electron app
- * (file:// protocol doesn't work with BrowserRouter)
  */
-//all rvuting stuff
+//all routing stuff
 import { PopupMessages } from "@/bits/popup-messages";
 import { Toaster as QuickMessages } from "@/components/user-interface/sonner";
 import { TooltipProvider } from "@/components/user-interface/tooltip";
